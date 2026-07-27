@@ -1,0 +1,80 @@
+.workspace {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: 228px 1fr;
+  background: #080a0d;
+  color: #f5f5f0;
+  overflow: hidden;
+}
+.workspace[hidden], .entity-modal[hidden] { display: none; }
+.workspace-sidebar {
+  border-right: 1px solid rgba(255,255,255,.09);
+  background: rgba(8,10,13,.96);
+  padding: 28px 19px 22px;
+  display: flex;
+  flex-direction: column;
+}
+.workspace-sidebar .brand { margin: 0 8px 49px; }
+.workspace-nav { display: grid; gap: 7px; }
+.workspace-nav button {
+  height: 48px; border: 0; border-radius: 10px; padding: 0 13px;
+  background: transparent; color: #777e87; text-align: left; cursor: pointer;
+  display: flex; align-items: center; gap: 12px; transition: .2s;
+}
+.workspace-nav button:hover { color: white; transform: translateX(3px); }
+.workspace-nav button.active { background: #191c20; color: white; box-shadow: inset 0 0 0 1px rgba(255,255,255,.05); }
+.workspace-nav button.active::before { content: ""; position: absolute; left: 0; width: 3px; height: 23px; border-radius: 2px; background: var(--acid); box-shadow: 0 0 13px var(--acid); }
+.workspace-nav .nav-symbol { width: 21px; font-size: 19px; text-align: center; }
+.workspace-nav b { margin-left: auto; font-size: 9px; padding: 3px 7px; border-radius: 10px; background: #292d31; }
+.bridge-badge { margin-top: auto; padding: 14px; border: 1px solid rgba(255,255,255,.08); border-radius: 12px; background: #101317; }
+.bridge-badge span { display: block; color: var(--acid); font: 600 8px Manrope; letter-spacing: 1.3px; margin-bottom: 6px; }
+.bridge-badge strong { display: block; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bridge-badge small { color: #666d75; font-size: 8px; }
+.workspace-main { overflow: auto; min-width: 0; background: radial-gradient(circle at 73% -5%, #292b1b 0, transparent 25%); }
+.workspace-topbar { height: 82px; border-bottom: 1px solid rgba(255,255,255,.08); padding: 0 4vw; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 5; backdrop-filter: blur(18px); background: rgba(8,10,13,.72); }
+.workspace-topbar .crumb { font: 600 8px Manrope; letter-spacing: 1.4px; color: #707780; }
+.workspace-topbar .crumb b { color: #f1f2ec; margin-left: 12px; }
+.primary-button, .ghost-button { height: 40px; border-radius: 8px; cursor: pointer; font: 700 9px Manrope; letter-spacing: .7px; }
+.primary-button { border: 1px solid var(--acid); background: var(--acid); color: #13160d; padding: 0 17px; }
+.primary-button:hover { box-shadow: 0 0 25px rgba(217,255,99,.2); transform: translateY(-1px); }
+.ghost-button { border: 1px solid rgba(255,255,255,.11); background: rgba(255,255,255,.04); color: #b2b7bc; padding: 0 15px; }
+.workspace-view { padding: 38px 4vw 70px; animation: arrive .45s ease; }
+.workspace-heading { display: flex; justify-content: space-between; align-items: end; gap: 25px; margin-bottom: 28px; }
+.workspace-heading h1 { font: 500 clamp(35px,4vw,57px) Manrope; letter-spacing: -2.7px; margin: 8px 0 4px; }
+.workspace-heading p { color: #858b93; max-width: 450px; font-size: 11px; line-height: 1.7; }
+.world-hero { display: grid; grid-template-columns: 1.65fr .85fr; gap: 14px; }
+.feature-card, .entity-card { border: 1px solid rgba(255,255,255,.1); border-radius: 17px; overflow: hidden; position: relative; background: #15181b; cursor: pointer; }
+.feature-card { height: 385px; }
+.feature-card img, .entity-card img, .profile img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s ease; }
+.feature-card:hover img, .entity-card:hover img { transform: scale(1.04); }
+.feature-card::after, .entity-card::after, .profile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(4,5,7,.96), transparent 70%); }
+.card-copy { position: absolute; z-index: 2; left: 25px; right: 25px; bottom: 23px; }
+.archive-tag { display: inline-block; padding: 5px 8px; border-radius: 4px; background: var(--acid); color: #14170d; font: 700 7px Manrope; letter-spacing: 1px; }
+.card-copy h2, .card-copy h3 { font: 600 28px Manrope; margin: 11px 0 2px; letter-spacing: -1px; }
+.card-copy p { margin: 0; color: #a6abb0; font-size: 10px; }
+.feature-card.secondary .card-copy h2 { font-size: 22px; }
+.command-strip { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 14px; }
+.command-tile { min-height: 125px; border: 1px solid rgba(255,255,255,.09); border-radius: 14px; background: linear-gradient(145deg,#14171b,#0d0f12); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+button.command-tile { color: white; text-align: left; cursor: pointer; }
+.command-tile:hover { border-color: rgba(217,255,99,.28); }
+.command-tile small { color: #767d85; font: 600 8px Manrope; letter-spacing: 1px; }
+.command-tile strong { font: 500 27px Manrope; }.command-tile strong i { font-style: normal; color: var(--acid); font-size: 10px; }
+.collection-tools { display: flex; gap: 9px; }
+.collection-tools input { width: 220px; height: 40px; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; background: #0e1115; color: white; padding: 0 13px; outline: none; }
+.collection-grid { display: grid; grid-template-columns: repeat(3,minmax(210px,1fr)); gap: 15px; }
+.entity-card { height: 385px; }.entity-card .card-copy h3 { font-size: 22px; }.entity-card .archive-tag { background: transparent; color: var(--acid); padding: 0; }
+.add-card { min-height: 300px; border: 1px dashed rgba(255,255,255,.16); border-radius: 16px; background: transparent; color: #767d85; cursor: pointer; display: grid; place-items: center; text-align: center; }
+.add-card span { width: 42px; height: 42px; border: 1px solid rgba(217,255,99,.3); border-radius: 50%; display: grid; place-items: center; color: var(--acid); font-size: 23px; margin: auto; }
+.empty-universe { min-height: 420px; border: 1px dashed rgba(255,255,255,.13); border-radius: 18px; display: grid; place-items: center; text-align: center; background: radial-gradient(circle,rgba(217,255,99,.04),transparent 50%); }
+.empty-universe .empty-orb { width: 88px; height: 88px; border-radius: 50%; border: 1px solid rgba(217,255,99,.24); margin: 0 auto 22px; display: grid; place-items: center; color: var(--acid); font-size: 28px; box-shadow: 0 0 50px rgba(217,255,99,.08); }
+.empty-universe h2 { font: 500 27px Manrope; margin: 0 0 7px; }.empty-universe p { color: #7f858c; font-size: 11px; margin-bottom: 20px; }
+.profile { height: calc(100vh - 155px); min-height: 560px; border-radius: 19px; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,.1); }
+.profile-copy { position: absolute; z-index: 2; left: 5%; bottom: 7%; max-width: 590px; }.profile-copy h1 { font: 500 clamp(46px,6vw,76px) Manrope; letter-spacing: -4px; margin: 9px 0 4px; }.profile-copy .subtitle { letter-spacing: 1.5px; font-size: 10px; }.profile-copy .lore { color: #a1a6ac; font-size: 11px; line-height: 1.8; max-width: 500px; }.profile-actions { display: flex; gap: 8px; margin-top: 18px; }
+.connections { position: absolute; z-index: 3; right: 26px; bottom: 25px; width: 230px; padding: 15px; border: 1px solid rgba(255,255,255,.11); border-radius: 13px; background: rgba(8,10,12,.82); backdrop-filter: blur(18px); }.connections h4 { color: #878e95; font: 600 8px Manrope; letter-spacing: 1px; margin: 0 0 10px; }.connection { display: flex; align-items: center; gap: 9px; padding: 7px; border-radius: 8px; cursor: pointer; }.connection:hover { background: rgba(255,255,255,.07); }.connection img { width: 34px; height: 34px; border-radius: 7px; object-fit: cover; }.connection strong { font-size: 9px; }
+.entity-modal { position: fixed; inset: 0; z-index: 50; background: rgba(3,4,6,.88); backdrop-filter: blur(14px); display: grid; place-items: center; padding: 20px; }
+.entity-dialog { width: min(560px,100%); max-height: 92vh; overflow: auto; border: 1px solid rgba(255,255,255,.13); border-radius: 17px; background: #111419; padding: 31px; position: relative; box-shadow: 0 40px 100px #000; }.entity-dialog h2 { font: 500 29px Manrope; margin: 9px 0 5px; }.entity-dialog>p { color: #7d848d; font-size: 10px; }.dialog-close { position: absolute; right: 18px; top: 15px; border: 0; background: none; color: #888f96; font-size: 24px; cursor: pointer; }.entity-dialog form { display: grid; gap: 14px; margin-top: 24px; }.entity-dialog label { display: grid; gap: 7px; color: #9ba1a7; font: 600 8px Manrope; letter-spacing: 1px; }.entity-dialog input,.entity-dialog textarea,.entity-dialog select { width: 100%; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; background: #090b0e; color: white; padding: 11px; outline: 0; font: 400 11px "DM Sans"; letter-spacing: 0; }.entity-dialog input:focus,.entity-dialog textarea:focus { border-color: rgba(217,255,99,.5); }.entity-dialog select { min-height: 70px; }.entity-dialog small { color: #5f656c; }.dialog-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 5px; }
+.workspace-toast { position: fixed; z-index: 70; right: 25px; bottom: 25px; padding: 12px 17px; border-radius: 8px; background: var(--acid); color: #12150d; font: 700 9px Manrope; letter-spacing: .5px; transform: translateY(90px); transition: .3s; }.workspace-toast.show { transform: none; }
+@media(max-width:900px){.workspace{grid-template-columns:75px 1fr}.workspace-sidebar{padding:28px 11px}.workspace-sidebar .brand span:last-child,.workspace-nav button span:not(.nav-symbol),.workspace-nav b,.bridge-badge{display:none}.workspace-sidebar .brand{margin-left:12px}.workspace-nav button{justify-content:center}.collection-grid{grid-template-columns:repeat(2,1fr)}.world-hero{grid-template-columns:1fr}.feature-card.secondary{height:260px}.connections{right:15px}}
+@media(max-width:620px){.workspace{display:block}.workspace-sidebar{position:fixed;z-index:10;left:0;right:0;bottom:0;height:67px;padding:8px;display:block;border-right:0;border-top:1px solid rgba(255,255,255,.1)}.workspace-sidebar .brand{display:none}.workspace-nav{display:flex;justify-content:space-around}.workspace-nav button{height:49px}.workspace-main{height:100vh}.workspace-view{padding:28px 18px 90px}.workspace-topbar{padding:0 18px;height:70px}.world-hero{display:block}.feature-card{height:410px}.feature-card.secondary{margin-top:14px}.command-strip{grid-template-columns:1fr}.collection-grid{grid-template-columns:1fr}.workspace-heading{display:block}.collection-tools{margin-top:18px}.profile{min-height:700px}.profile-copy{bottom:170px}.connections{left:5%;right:5%;bottom:20px;width:auto}}
