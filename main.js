@@ -47,7 +47,7 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
   const desktop = window.mediatorDesktop;
   let sessionBridge = null;
   let universe = null;
-  let currentPage = "home";
+  let currentPage = "characters";
   let currentDetail = null;
   const fallbackImage = "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1400&q=85";
 
@@ -87,11 +87,11 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
       document.documentElement.style.setProperty("--my", `${event.clientY / innerHeight * 100}%`);
       if (scene && !$("#workspace").hidden) return;
       if (scene) scene.style.transform = `translate(-50%,-50%) rotateX(${(event.clientY / innerHeight - .5) * -7}deg) rotateY(${(event.clientX / innerWidth - .5) * 9}deg)`;
-      const card = event.target.closest(".feature-card,.entity-card,.command-tile");
+      const card = event.target.closest(".feature-card,.entity-card,.roster-card");
       if (card) { const box = card.getBoundingClientRect(); card.style.transform = `perspective(900px) rotateX(${(event.clientY - box.top) / box.height * -7 + 3.5}deg) rotateY(${(event.clientX - box.left) / box.width * 8 - 4}deg) translateY(-3px)`; }
     });
     document.addEventListener("pointerover", (event) => { if (event.target.closest("button,a,input,.feature-card,.entity-card")) aura.classList.add("active"); });
-    document.addEventListener("pointerout", (event) => { aura.classList.remove("active"); const card = event.target.closest(".feature-card,.entity-card,.command-tile"); if (card) card.style.transform = ""; });
+    document.addEventListener("pointerout", (event) => { aura.classList.remove("active"); const card = event.target.closest(".feature-card,.entity-card,.roster-card"); if (card) card.style.transform = ""; });
     resizeField(); drawField();
   }
 
@@ -145,49 +145,52 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
     catch (error) { toast(`SAVE FAILED · ${error.message}`); }
   };
   const workspaceShell = () => {
-    $("#workspace").innerHTML = `<aside class="workspace-sidebar"><div class="brand"><span class="brand-mark"><i></i><i></i><i></i></span><span>MEDIATOR <b>2</b></span></div><nav class="workspace-nav"><button data-page="home"><span class="nav-symbol">⌂</span><span>Home</span></button><button data-page="characters"><span class="nav-symbol">♙</span><span>Characters</span><b id="characterCount"></b></button><button data-page="locations"><span class="nav-symbol">◇</span><span>Locations</span><b id="locationCount"></b></button></nav><div class="bridge-badge"><span>● BRIDGE ONLINE</span><strong>${escapeHTML(sessionBridge.repository.full_name)}</strong><small>${escapeHTML(sessionBridge.repository.default_branch)} · GitHub REST</small></div></aside><main class="workspace-main"><header class="workspace-topbar"><div class="crumb">THE UNIVERSE <b id="workspaceCrumb">COMMAND CENTER</b></div><button class="primary-button" data-create="character">＋ CREATE NEW</button></header><section id="workspaceView" class="workspace-view"></section></main>`;
+    $("#workspace").innerHTML = `<main class="workspace-main"><header class="workspace-topbar"><div class="brand"><span class="brand-mark"><i></i><i></i><i></i></span><span>MEDIATOR <b>2</b></span></div><div class="character-status"><span></span><div><small>CHARACTER ARCHIVE</small><strong id="characterCount">0 CHARACTERS</strong></div></div><div class="topbar-actions"><div class="bridge-inline"><span>● BRIDGE ONLINE</span><small>${escapeHTML(sessionBridge.repository.full_name)}</small></div><button class="primary-button" data-create="character">＋ NEW CHARACTER</button></div></header><section id="workspaceView" class="workspace-view"></section></main>`;
     const scroller = $(".workspace-main");
     scroller.addEventListener("scroll", () => { const range = scroller.scrollHeight - scroller.clientHeight; $(".scroll-progress").style.width = `${range ? scroller.scrollTop / range * 100 : 0}%`; }, { passive: true });
   };
-  const homeView = () => {
-    const character = universe.characters[0], location = universe.locations[0];
-    const content = character || location ? `<div class="world-hero">${character ? `<article class="feature-card" data-detail="character:${character.id}">${image(character)}<div class="card-copy"><span class="archive-tag">FEATURED CHARACTER</span><h2>${escapeHTML(character.name)}</h2><p>${escapeHTML(character.subtitle || "Unwritten legend")}</p></div></article>` : `<button class="empty-universe" data-create="character"><div><div class="empty-orb">＋</div><h2>Forge your first character</h2><p>Every universe needs someone to change it.</p></div></button>`}${location ? `<article class="feature-card secondary" data-detail="location:${location.id}">${image(location)}<div class="card-copy"><span class="archive-tag">EXPLORE LOCATION</span><h2>${escapeHTML(location.name)}</h2><p>${escapeHTML(location.meta || location.subtitle || "Unknown realm")}</p></div></article>` : `<button class="empty-universe" data-create="location"><div><div class="empty-orb">＋</div><h2>Discover a location</h2><p>Give your stories somewhere to unfold.</p></div></button>`}</div>` : `<div class="empty-universe"><div><div class="empty-orb">◇</div><h2>Your universe is waiting.</h2><p>The bridge is connected. Create the first soul or place in your new world.</p><button class="primary-button" data-create="character">CREATE FIRST CHARACTER →</button></div></div>`;
-    $("#workspaceView").innerHTML = `<div class="workspace-heading"><div><span class="edition">WELCOME BACK, ARCHITECT</span><h1>Your universe is alive.</h1><p>Shape people and places, connect their stories, and let GitHub preserve every change.</p></div></div>${content}<div class="command-strip"><button class="command-tile" data-create="character"><small>QUICK ACTION</small><strong>＋ Character</strong></button><button class="command-tile" data-create="location"><small>QUICK ACTION</small><strong>＋ Location</strong></button><div class="command-tile"><small>UNIVERSE ARCHIVE</small><strong>${universe.characters.length + universe.locations.length} <i>ENTRIES</i></strong></div></div>`;
-  };
   const collectionView = (type, query = "") => {
-    const plural = `${type}s`, items = universe[plural].filter((item) => `${item.name} ${item.subtitle || ""}`.toLowerCase().includes(query.toLowerCase()));
-    const heading = type === "character" ? "Meet the legends." : "Explore the realm.";
-    $("#workspaceView").innerHTML = `<div class="workspace-heading"><div><span class="edition">${plural.toUpperCase()} ARCHIVE</span><h1>${heading}</h1><p>${type === "character" ? "Every hero, villain, and wanderer shaping the fate of your universe." : "Places with histories, atmosphere, and people whose stories cross their borders."}</p></div><div class="collection-tools"><input id="archiveSearch" value="${escapeHTML(query)}" placeholder="Search ${plural}…"><button class="primary-button" data-create="${type}">＋ ADD</button></div></div><div class="collection-grid">${items.map((item) => `<article class="entity-card" data-detail="${type}:${item.id}">${image(item)}<div class="card-copy"><span class="archive-tag">${escapeHTML(item.meta || "ARCHIVE ENTRY")}</span><h3>${escapeHTML(item.name)}</h3><p>${escapeHTML(item.subtitle || "Story in progress")}</p></div></article>`).join("")}<button class="add-card" data-create="${type}"><div><span>＋</span><p>Create ${type}</p></div></button></div>`;
-    $("#archiveSearch").addEventListener("input", (event) => { collectionView(type, event.target.value); $("#archiveSearch").focus(); });
+    const items = universe.characters.filter((item) => `${item.name} ${item.subtitle || ""}`.toLowerCase().includes(query.toLowerCase()));
+    const featured = items[0] || universe.characters[0];
+    if (!featured) {
+      $("#workspaceView").innerHTML = `<div class="empty-universe"><div><span class="edition">CHARACTER ARCHIVE // EMPTY</span><div class="empty-orb">＋</div><h2>Summon your first legend.</h2><p>Build a character sheet and begin assembling your roster.</p><button class="primary-button" data-create="character">CREATE FIRST CHARACTER →</button></div></div>`;
+      return;
+    }
+    const panels = (featured.gallery || []).slice(0, 8);
+    const panelSlots = Array.from({ length: 8 }, (_, index) => panels[index]
+      ? `<figure class="character-panel filled"><img src="${escapeHTML(panels[index])}" alt="${escapeHTML(featured.name)} character panel ${index + 1}" onerror="this.closest('figure').classList.add('image-error')"><figcaption><span>0${index + 1}</span> CHARACTER ART</figcaption></figure>`
+      : `<div class="character-panel empty"><span>0${index + 1}</span><i>＋</i><strong>PORTRAIT SLOT</strong><small>ADD ARTWORK IN EDIT</small></div>`).join("");
+    $("#workspaceView").innerHTML = `<section class="character-sheet"><aside class="sheet-portrait">${image(featured)}<div class="portrait-frame"></div><div class="portrait-index">PRIMARY <span>// PORTRAIT</span></div><div class="portrait-caption"><span>ACTIVE CHARACTER</span><strong>${escapeHTML(featured.meta || "LEVEL —")}</strong></div></aside><div class="sheet-content"><nav class="character-switcher" aria-label="Character roster"><span>ROSTER</span>${universe.characters.map((item) => `<button class="${item.id === featured.id ? "active" : ""}" data-detail="character:${item.id}">${image(item)}<span>${escapeHTML(item.name)}</span></button>`).join("")}<button class="add-character" data-create="character" aria-label="Create character">＋</button></nav><header class="sheet-heading"><div><span class="edition">CHARACTER SHEET // ${escapeHTML(featured.meta || "UNRANKED")}</span><h1>${escapeHTML(featured.name)}</h1><p>${escapeHTML(featured.subtitle || "UNWRITTEN LEGEND")}</p></div><button class="ghost-button" data-edit="character:${featured.id}">EDIT CHARACTER</button></header><div class="panel-label"><div><span>VISUAL ARCHIVE</span><strong>CHARACTER PANELS</strong></div><p>PORTRAIT FORMAT · ${panels.length} / 08 ASSIGNED</p></div><div class="character-panel-grid">${panelSlots}</div></div></section>`;
   };
   const profileView = (type, id) => {
     const plural = `${type}s`, item = universe[plural].find((entry) => entry.id === id);
     if (!item) return navigate(plural);
-    const related = type === "character" ? universe.locations.filter((location) => (item.relations || []).includes(location.id)) : universe.characters.filter((character) => (character.relations || []).includes(item.id));
-    $("#workspaceView").innerHTML = `<article class="profile">${image(item)}<div class="profile-copy"><span class="edition">${escapeHTML(item.meta || "UNIVERSE ARCHIVE")}</span><h1>${escapeHTML(item.name)}</h1><p class="subtitle">${escapeHTML(item.subtitle || "STORY IN PROGRESS")}</p><p class="lore">${escapeHTML(item.description || "This entry is waiting for its story to be written.")}</p><div class="profile-actions"><button class="primary-button" data-edit="${type}:${id}">EDIT PROFILE</button><button class="ghost-button" data-delete="${type}:${id}">ARCHIVE ENTRY</button></div></div><aside class="connections"><h4>${type === "character" ? "CONNECTED LOCATIONS" : "CHARACTERS PRESENT"}</h4>${related.length ? related.map((entry) => `<div class="connection" data-detail="${type === "character" ? "location" : "character"}:${entry.id}">${image(entry)}<strong>${escapeHTML(entry.name)}</strong></div>`).join("") : "<small>No connections yet. Edit this profile to build one.</small>"}</aside></article>`;
+    const original = universe.characters.indexOf(item);
+    if (original > 0) universe.characters.unshift(...universe.characters.splice(original, 1));
+    currentDetail = null;
+    collectionView("character");
   };
   const navigate = (page, detailId = null) => {
     currentPage = page; currentDetail = detailId;
-    const type = page === "characters" ? "character" : "location";
-    document.querySelectorAll(".workspace-nav button").forEach((button) => button.classList.toggle("active", button.dataset.page === page));
-    $("#workspaceCrumb").textContent = detailId ? "ARCHIVE PROFILE" : page === "home" ? "COMMAND CENTER" : page.toUpperCase();
-    $("#characterCount").textContent = universe.characters.length; $("#locationCount").textContent = universe.locations.length;
-    detailId ? profileView(type, detailId) : page === "home" ? homeView() : collectionView(type);
+    const type = "character";
+    $("#characterCount").textContent = `${universe.characters.length} CHARACTER${universe.characters.length === 1 ? "" : "S"}`;
+    detailId ? profileView(type, detailId) : collectionView(type);
     $(".workspace-main").scrollTo({ top: 0, behavior: "smooth" });
   };
   const openEntityModal = (type, id = "") => {
     const form = $("#entityForm"), item = id ? universe[`${type}s`].find((entry) => entry.id === id) : null;
     form.reset(); form.elements.type.value = type; form.elements.id.value = id;
     $("#entityModalTitle").textContent = `${id ? "Edit" : "Create"} ${type}`; $("#entityModalLabel").textContent = `${type.toUpperCase()} ARCHIVE`;
-    $("#subtitleField").childNodes[0].textContent = type === "character" ? "TITLE" : "LOCATION TYPE"; $("#metaField").childNodes[0].textContent = type === "character" ? "LEVEL" : "REGION";
-    $("#relationsField").hidden = type === "location"; form.elements.relations.innerHTML = universe.locations.map((location) => `<option value="${location.id}">${escapeHTML(location.name)}</option>`).join("");
-    if (item) { ["name", "subtitle", "meta", "image", "description"].forEach((key) => { form.elements[key].value = item[key] || ""; }); [...form.elements.relations.options].forEach((option) => { option.selected = (item.relations || []).includes(option.value); }); }
+    if (item) {
+      ["name", "subtitle", "meta", "image", "description"].forEach((key) => { form.elements[key].value = item[key] || ""; });
+      form.elements.gallery.value = (item.gallery || []).join("\n");
+    }
     $("#entityModal").hidden = false; setTimeout(() => form.elements.name.focus(), 50);
   };
   const enterWorkspace = () => {
     universe = { version: 2, characters: [], locations: [], ...sessionBridge.archive };
     universe.characters ||= []; universe.locations ||= [];
-    workspaceShell(); $("#workspace").hidden = false; $("#success").hidden = true; navigate("home");
+    workspaceShell(); $("#workspace").hidden = false; $("#success").hidden = true; navigate("characters");
   };
   const restoreCredentials = async () => {
     const saved = await desktop?.loadCredentials();
@@ -231,8 +234,8 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
   $("#entityModal").addEventListener("click", (event) => { if (event.target === $("#entityModal")) $("#entityModal").hidden = true; });
   $("#entityForm").addEventListener("submit", (event) => {
     event.preventDefault(); const data = new FormData(event.target), type = data.get("type"), id = data.get("id") || `${type[0]}${Date.now()}`, list = universe[`${type}s`], existing = list.find((entry) => entry.id === id);
-    const item = { ...existing, id, name: data.get("name").trim(), subtitle: data.get("subtitle").trim(), meta: data.get("meta").trim(), image: data.get("image").trim(), description: data.get("description").trim() };
-    if (type === "character") item.relations = data.getAll("relations"); existing ? Object.assign(existing, item) : list.unshift(item);
+    const item = { ...existing, id, name: data.get("name").trim(), subtitle: data.get("subtitle").trim(), meta: data.get("meta").trim(), image: data.get("image").trim(), gallery: data.get("gallery").split(/\r?\n/).map((url) => url.trim()).filter(Boolean).slice(0, 8), description: data.get("description").trim() };
+    existing ? Object.assign(existing, item) : list.unshift(item);
     $("#entityModal").hidden = true; navigate(`${type}s`, id); persist(existing ? "PROFILE UPDATED · BRIDGE SAVED" : "NEW ENTRY CREATED · BRIDGE SAVED");
   });
   document.addEventListener("keydown", (event) => { if (event.key === "Escape") $("#entityModal").hidden = true; });
