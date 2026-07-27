@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080a0e" />
+  <title>Mediator — Your universe, alive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <button class="brand" data-page="home" aria-label="Mediator home">
+        <span class="brand-mark"><i></i><i></i><i></i></span>
+        <span>MEDIATOR</span>
+      </button>
+      <nav aria-label="Main navigation">
+        <button class="nav-item active" data-page="home"><span class="nav-icon">⌂</span><span>Home</span></button>
+        <button class="nav-item" data-page="characters"><span class="nav-icon">♙</span><span>Characters</span><b id="characterCount">0</b></button>
+        <button class="nav-item" data-page="locations"><span class="nav-icon">◇</span><span>Locations</span><b id="locationCount">0</b></button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="universe-status"><span class="pulse"></span><div><small>ACTIVE UNIVERSE</small><strong>The Shattered Realm</strong></div></div>
+        <button class="avatar">JD</button>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div class="breadcrumb"><span>THE SHATTERED REALM</span><i>/</i><strong id="pageLabel">COMMAND CENTER</strong></div>
+        <div class="top-actions">
+          <button class="icon-btn" id="searchToggle" aria-label="Search">⌕</button>
+          <button class="create-btn" id="globalCreate"><span>＋</span> Create new</button>
+        </div>
+      </header>
+      <section id="view" class="view" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" aria-label="Close">×</button>
+      <div class="eyebrow" id="modalEyebrow">NEW ARCHIVE ENTRY</div>
+      <h2 id="modalTitle">Create character</h2>
+      <p class="modal-copy">Start with the essentials. You can shape the details as your universe grows.</p>
+      <form id="editorForm">
+        <input type="hidden" name="id"><input type="hidden" name="type">
+        <label>Name <input name="name" required placeholder="Enter a name"></label>
+        <div class="form-row">
+          <label id="subtitleLabel">Title <input name="subtitle" placeholder="Role or title"></label>
+          <label id="metaLabel">Level <input name="meta" placeholder="Level 01"></label>
+        </div>
+        <label>Image URL <input name="image" type="url" placeholder="https://…"></label>
+        <label>Short lore <textarea name="description" rows="4" placeholder="What should the archive remember?"></textarea></label>
+        <label id="relationLabel">Connected locations <select name="relations" multiple></select><small>Hold Ctrl / Cmd to select more than one.</small></label>
+        <div class="form-actions"><button type="button" class="text-btn" id="cancelEdit">Cancel</button><button class="create-btn" type="submit">Save to archive <span>→</span></button></div>
+      </form>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
