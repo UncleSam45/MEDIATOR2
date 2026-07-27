@@ -12,20 +12,26 @@
   <link rel="stylesheet" href="workspace.css">
 </head>
 <body>
+  <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
+  <div class="cursor-aura" aria-hidden="true"><i></i></div>
+  <div class="scroll-progress" aria-hidden="true"></div>
   <div class="noise"></div>
   <main class="portal-shell">
     <section class="world-panel" aria-label="Mediator introduction">
       <div class="titlebar-drag"></div>
       <div class="brand"><span class="brand-mark"><i></i><i></i><i></i></span><span>MEDIATOR <b>2</b></span></div>
       <div class="orbital-scene" aria-hidden="true">
+        <div class="scene-glow"></div>
+        <div class="scan-line"></div>
         <div class="orbit orbit-one"><i></i><i></i></div>
         <div class="orbit orbit-two"><i></i></div>
+        <div class="orbit orbit-three"><i></i><i></i><i></i></div>
         <div class="planet"><span></span></div>
         <div class="horizon"></div>
       </div>
       <div class="world-copy">
         <span class="edition">UNIVERSE ARCHITECT · SECOND EDITION</span>
-        <h1>Every world<br>begins with a <em>door.</em></h1>
+        <h1 class="split-title">Every world<br>begins with a <em>door.</em></h1>
         <p>Connect your private bridge and step inside the universe only you can build.</p>
       </div>
       <div class="system-status"><span></span> SYSTEM READY <i>02 / 02</i></div>

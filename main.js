@@ -51,6 +51,50 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
   let currentDetail = null;
   const fallbackImage = "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1400&q=85";
 
+  // A lightweight, dependency-free motion engine shared by the portal and archive.
+  const motionEnabled = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const title = $(".split-title");
+  title.innerHTML = `<span class="word" style="--i:0">Every</span> <span class="word" style="--i:1">world</span><br><span class="word" style="--i:2">begins</span> <span class="word" style="--i:3">with</span> <span class="word" style="--i:4">a</span> <em class="word" style="--i:5">door.</em>`;
+  if (motionEnabled) {
+    const canvas = $("#starfield"), context = canvas.getContext("2d");
+    const pointer = { x: innerWidth / 2, y: innerHeight / 2, tx: innerWidth / 2, ty: innerHeight / 2 };
+    let stars = [];
+    const resizeField = () => {
+      const ratio = Math.min(devicePixelRatio || 1, 2);
+      canvas.width = innerWidth * ratio; canvas.height = innerHeight * ratio;
+      canvas.style.width = `${innerWidth}px`; canvas.style.height = `${innerHeight}px`;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      stars = Array.from({ length: Math.min(140, Math.floor(innerWidth / 10)) }, () => ({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, z: Math.random() * 1.5 + .2, size: Math.random() * 1.5 + .25 }));
+    };
+    const drawField = () => {
+      pointer.x += (pointer.tx - pointer.x) * .07; pointer.y += (pointer.ty - pointer.y) * .07;
+      context.clearRect(0, 0, innerWidth, innerHeight);
+      stars.forEach((star) => {
+        star.y -= star.z * .08; if (star.y < -3) star.y = innerHeight + 3;
+        const x = star.x + (pointer.x - innerWidth / 2) * star.z * -.018;
+        const y = star.y + (pointer.y - innerHeight / 2) * star.z * -.018;
+        context.beginPath(); context.arc(x, y, star.size * star.z, 0, Math.PI * 2);
+        context.fillStyle = `rgba(217,255,99,${.08 + star.z * .16})`; context.fill();
+      });
+      requestAnimationFrame(drawField);
+    };
+    const aura = $(".cursor-aura"), scene = $(".orbital-scene");
+    window.addEventListener("resize", resizeField);
+    document.addEventListener("pointermove", (event) => {
+      pointer.tx = event.clientX; pointer.ty = event.clientY;
+      aura.style.transform = `translate3d(${event.clientX - aura.offsetWidth / 2}px,${event.clientY - aura.offsetHeight / 2}px,0)`;
+      document.documentElement.style.setProperty("--mx", `${event.clientX / innerWidth * 100}%`);
+      document.documentElement.style.setProperty("--my", `${event.clientY / innerHeight * 100}%`);
+      if (scene && !$("#workspace").hidden) return;
+      if (scene) scene.style.transform = `translate(-50%,-50%) rotateX(${(event.clientY / innerHeight - .5) * -7}deg) rotateY(${(event.clientX / innerWidth - .5) * 9}deg)`;
+      const card = event.target.closest(".feature-card,.entity-card,.command-tile");
+      if (card) { const box = card.getBoundingClientRect(); card.style.transform = `perspective(900px) rotateX(${(event.clientY - box.top) / box.height * -7 + 3.5}deg) rotateY(${(event.clientX - box.left) / box.width * 8 - 4}deg) translateY(-3px)`; }
+    });
+    document.addEventListener("pointerover", (event) => { if (event.target.closest("button,a,input,.feature-card,.entity-card")) aura.classList.add("active"); });
+    document.addEventListener("pointerout", (event) => { aura.classList.remove("active"); const card = event.target.closest(".feature-card,.entity-card,.command-tile"); if (card) card.style.transform = ""; });
+    resizeField(); drawField();
+  }
+
   const setLoading = (loading) => {
     $("#submitButton").classList.toggle("loading", loading);
     $("#submitButton").disabled = loading;
@@ -102,6 +146,8 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
   };
   const workspaceShell = () => {
     $("#workspace").innerHTML = `<aside class="workspace-sidebar"><div class="brand"><span class="brand-mark"><i></i><i></i><i></i></span><span>MEDIATOR <b>2</b></span></div><nav class="workspace-nav"><button data-page="home"><span class="nav-symbol">⌂</span><span>Home</span></button><button data-page="characters"><span class="nav-symbol">♙</span><span>Characters</span><b id="characterCount"></b></button><button data-page="locations"><span class="nav-symbol">◇</span><span>Locations</span><b id="locationCount"></b></button></nav><div class="bridge-badge"><span>● BRIDGE ONLINE</span><strong>${escapeHTML(sessionBridge.repository.full_name)}</strong><small>${escapeHTML(sessionBridge.repository.default_branch)} · GitHub REST</small></div></aside><main class="workspace-main"><header class="workspace-topbar"><div class="crumb">THE UNIVERSE <b id="workspaceCrumb">COMMAND CENTER</b></div><button class="primary-button" data-create="character">＋ CREATE NEW</button></header><section id="workspaceView" class="workspace-view"></section></main>`;
+    const scroller = $(".workspace-main");
+    scroller.addEventListener("scroll", () => { const range = scroller.scrollHeight - scroller.clientHeight; $(".scroll-progress").style.width = `${range ? scroller.scrollTop / range * 100 : 0}%`; }, { passive: true });
   };
   const homeView = () => {
     const character = universe.characters[0], location = universe.locations[0];
@@ -170,6 +216,10 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
   $("#closeWindow").addEventListener("click", () => desktop?.close());
   $("#forgetButton").addEventListener("click", async () => { await desktop?.clearCredentials(); form.reset(); $("#forgetButton").hidden = true; });
   document.addEventListener("click", (event) => {
+    if (motionEnabled) {
+      const burst = document.createElement("span"); burst.className = "click-burst"; burst.style.left = `${event.clientX}px`; burst.style.top = `${event.clientY}px`;
+      document.body.appendChild(burst); burst.addEventListener("animationend", () => burst.remove());
+    }
     const page = event.target.closest("[data-page]"), create = event.target.closest("[data-create]"), detail = event.target.closest("[data-detail]"), edit = event.target.closest("[data-edit]"), remove = event.target.closest("[data-delete]"), action = event.target.closest("[data-action]");
     if (page && universe) navigate(page.dataset.page);
     if (create && universe) openEntityModal(create.dataset.create);
