@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:">
+  <title>MEDIATOR 2 · Access Portal</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="noise"></div><div class="orb orb-one"></div><div class="orb orb-two"></div>
+  <main class="shell">
+    <section class="story">
+      <div class="brand"><span class="mark">M</span><span>MEDIATOR <b>2</b></span></div>
+      <div class="story-copy">
+        <p class="eyebrow"><span></span> PRIVATE WORKSPACE BRIDGE</p>
+        <h1>Your work.<br><em>In perfect sync.</em></h1>
+        <p class="intro">Connect a private GitHub repository and turn it into your encrypted, persistent workspace—ready wherever you are.</p>
+        <div class="features">
+          <div><i>01</i><p><strong>GitHub native</strong><small>Direct REST API connection</small></p></div>
+          <div><i>02</i><p><strong>Locally secured</strong><small>OS-encrypted credentials</small></p></div>
+          <div><i>03</i><p><strong>Always recoverable</strong><small>Versioned by every commit</small></p></div>
+        </div>
+      </div>
+      <p class="version">MEDIATOR SYSTEMS · DESKTOP 0.1</p>
+    </section>
+    <section class="portal">
+      <form id="login-form" autocomplete="off">
+        <div class="status-pill"><span></span> ACCESS PORTAL</div>
+        <h2>Connect your bridge</h2>
+        <p class="subhead">Enter the repository credentials for this workspace.</p>
+        <label for="owner">GitHub username <span>REQUIRED</span></label>
+        <div class="field"><span>@</span><input id="owner" name="owner" placeholder="octocat" required></div>
+        <label for="repo">Bridge repository <span>REQUIRED</span></label>
+        <div class="field"><span>◇</span><input id="repo" name="repo" placeholder="mediator-bridge" required></div>
+        <label for="token">Fine-grained access token <span>REQUIRED</span></label>
+        <div class="field"><span>⌁</span><input id="token" name="token" type="password" placeholder="github_pat_••••••••••••" required><button type="button" id="reveal" aria-label="Show token">◉</button></div>
+        <div class="remember"><label class="switch"><input id="remember" type="checkbox"><span></span></label><p><strong>Remember on this device</strong><small>Protected using your operating system's secure storage.</small></p></div>
+        <p id="message" role="alert"></p>
+        <button class="connect" type="submit"><span>Connect workspace</span><b>→</b></button>
+        <p class="permission">Token requires <strong>Contents: Read and write</strong> access.</p>
+      </form>
+    </section>
+  </main>
+  <script src="renderer.js"></script>
+</body>
+</html>
