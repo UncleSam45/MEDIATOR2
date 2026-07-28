@@ -198,6 +198,10 @@ button.command-tile { color: white; text-align: left; cursor: pointer; }
   border: 1px solid rgba(255,255,255,.1);
   border-radius: 3px 12px 3px 3px;
   background: linear-gradient(145deg,#12161a,#0b0e11);
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
 }
 .character-panel.filled img {
   width: 100%;
@@ -214,7 +218,7 @@ button.command-tile { color: white; text-align: left; cursor: pointer; }
   inset: 0;
   background: linear-gradient(0deg,rgba(5,7,8,.88),transparent 46%);
 }
-.character-panel figcaption {
+.character-panel .panel-caption {
   position: absolute;
   z-index: 2;
   left: 12px;
@@ -226,8 +230,9 @@ button.command-tile { color: white; text-align: left; cursor: pointer; }
   font: 600 6px Manrope;
   letter-spacing: .8px;
 }
-.character-panel figcaption span {
+.character-panel .panel-caption b {
   color: var(--acid);
+  font-weight: 600;
 }
 .character-panel.empty {
   display: grid;
@@ -268,6 +273,66 @@ button.command-tile { color: white; text-align: left; cursor: pointer; }
   font: 400 8px "DM Sans";
   letter-spacing: 0;
 }
+.character-facts {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  border-bottom: 1px solid rgba(255,255,255,.09);
+}
+.character-facts > div {
+  min-width: 0;
+  padding: 20px 20px 20px 0;
+  display: grid;
+  gap: 7px;
+}
+.character-facts > div + div {
+  padding-left: 20px;
+  border-left: 1px solid rgba(255,255,255,.09);
+}
+.character-facts span,.character-lore > span {
+  color: #686f76;
+  font: 600 7px Manrope;
+  letter-spacing: 1.3px;
+}
+.character-facts strong {
+  overflow: hidden;
+  color: #e6e8e2;
+  font: 500 10px Manrope;
+  letter-spacing: .4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.character-lore {
+  padding: 22px 0 4px;
+}
+.character-lore p {
+  max-width: 780px;
+  margin: 9px 0 0;
+  color: #969ca1;
+  font-size: 11px;
+  line-height: 1.75;
+}
+.art-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  grid-template-columns: 70px minmax(0,1fr) 70px;
+  align-items: center;
+  gap: 20px;
+  padding: 38px;
+  background: rgba(3,4,5,.94);
+  backdrop-filter: blur(20px);
+  animation: arrive .25s ease;
+}
+.art-lightbox[hidden] { display: none; }
+.art-lightbox figure { height: calc(100vh - 76px); min-width: 0; margin: 0; position: relative; display: grid; place-items: center; }
+.art-lightbox figure img { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 35px 100px #000; }
+.art-lightbox figcaption { position: absolute; left: 22px; right: 22px; bottom: 18px; display: flex; justify-content: space-between; gap: 20px; padding: 12px 15px; background: rgba(5,7,8,.74); backdrop-filter: blur(12px); }
+.art-lightbox figcaption span,.art-lightbox figcaption strong { color: var(--acid); font: 600 8px Manrope; letter-spacing: 1.2px; }
+.art-lightbox figcaption strong { color: #e5e7e1; }
+.lightbox-close { position: absolute; z-index: 2; right: 22px; top: 18px; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; background: #101316; color: white; font-size: 23px; cursor: pointer; }
+.lightbox-nav { width: 54px; height: 54px; border: 1px solid rgba(217,255,99,.25); border-radius: 50%; background: rgba(217,255,99,.04); color: var(--acid); font-size: 20px; cursor: pointer; }
+.lightbox-nav:hover,.lightbox-close:hover { border-color: var(--acid); background: rgba(217,255,99,.1); }
 @media(max-width:1100px) {
   .character-panel-grid { grid-template-columns: repeat(3, minmax(105px,1fr)); }
 }
@@ -276,4 +341,8 @@ button.command-tile { color: white; text-align: left; cursor: pointer; }
   .sheet-heading h1 { font-size: 52px; letter-spacing: -3px; }
   .sheet-heading .ghost-button { display: none; }
   .character-panel-grid { grid-template-columns: repeat(2,1fr); }
+  .character-facts { grid-template-columns: 1fr; }
+  .character-facts > div + div { padding-left: 0; border-left: 0; border-top: 1px solid rgba(255,255,255,.09); }
+  .art-lightbox { grid-template-columns: 45px minmax(0,1fr) 45px; gap: 7px; padding: 56px 8px 16px; }
+  .lightbox-nav { width: 40px; height: 40px; }
 }
