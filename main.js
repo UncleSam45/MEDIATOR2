@@ -49,6 +49,8 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
   let universe = null;
   let currentPage = "characters";
   let currentDetail = null;
+  let activeCharacterId = null;
+  let lightboxIndex = 0;
   const fallbackImage = "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1400&q=85";
 
   // A lightweight, dependency-free motion engine shared by the portal and archive.
@@ -115,7 +117,7 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
   const connectBridge = async (credentials) => {
     const base = `/repos/${encodeURIComponent(credentials.owner)}/${encodeURIComponent(credentials.repo)}`;
     const repository = await request(base, credentials);
-    let archive = { version: 2, characters: [], locations: [], updatedAt: null };
+    let archive = { version: 3, characters: [], locations: [], updatedAt: null };
     try {
       const file = await request(`${base}/contents/mediator/data.json`, credentials);
       archive = JSON.parse(decodeURIComponent(escape(atob(file.content.replace(/\n/g, "")))));
@@ -132,7 +134,8 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
       const base = `/repos/${encodeURIComponent(credentials.owner)}/${encodeURIComponent(credentials.repo)}/contents/mediator/data.json`;
       let sha;
       try { sha = (await request(base, credentials)).sha; } catch (error) { if (!/Not Found/i.test(error.message)) throw error; }
-      const content = btoa(unescape(encodeURIComponent(JSON.stringify({ ...data, version: 2, updatedAt: new Date().toISOString() }, null, 2))));
+      const characters = (data.characters || []).map((character) => ({ ...character, origin: String(character.origin || "Unknown origin").trim() }));
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify({ ...data, characters, version: 3, updatedAt: new Date().toISOString() }, null, 2))));
       await request(base, credentials, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: "Update Mediator universe archive", content, branch: repository.default_branch, ...(sha && { sha }) }) });
     }
   };
@@ -151,22 +154,22 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
   };
   const collectionView = (type, query = "") => {
     const items = universe.characters.filter((item) => `${item.name} ${item.subtitle || ""}`.toLowerCase().includes(query.toLowerCase()));
-    const featured = items[0] || universe.characters[0];
+    const featured = items.find((item) => item.id === activeCharacterId) || items[0] || universe.characters[0];
     if (!featured) {
       $("#workspaceView").innerHTML = `<div class="empty-universe"><div><span class="edition">CHARACTER ARCHIVE // EMPTY</span><div class="empty-orb">＋</div><h2>Summon your first legend.</h2><p>Build a character sheet and begin assembling your roster.</p><button class="primary-button" data-create="character">CREATE FIRST CHARACTER →</button></div></div>`;
       return;
     }
     const panels = (featured.gallery || []).slice(0, 8);
     const panelSlots = Array.from({ length: 8 }, (_, index) => panels[index]
-      ? `<figure class="character-panel filled"><img src="${escapeHTML(panels[index])}" alt="${escapeHTML(featured.name)} character panel ${index + 1}" onerror="this.closest('figure').classList.add('image-error')"><figcaption><span>0${index + 1}</span> CHARACTER ART</figcaption></figure>`
-      : `<div class="character-panel empty"><span>0${index + 1}</span><i>＋</i><strong>PORTRAIT SLOT</strong><small>ADD ARTWORK IN EDIT</small></div>`).join("");
-    $("#workspaceView").innerHTML = `<section class="character-sheet"><aside class="sheet-portrait">${image(featured)}<div class="portrait-frame"></div><div class="portrait-index">PRIMARY <span>// PORTRAIT</span></div><div class="portrait-caption"><span>ACTIVE CHARACTER</span><strong>${escapeHTML(featured.meta || "LEVEL —")}</strong></div></aside><div class="sheet-content"><nav class="character-switcher" aria-label="Character roster"><span>ROSTER</span>${universe.characters.map((item) => `<button class="${item.id === featured.id ? "active" : ""}" data-detail="character:${item.id}">${image(item)}<span>${escapeHTML(item.name)}</span></button>`).join("")}<button class="add-character" data-create="character" aria-label="Create character">＋</button></nav><header class="sheet-heading"><div><span class="edition">CHARACTER SHEET // ${escapeHTML(featured.meta || "UNRANKED")}</span><h1>${escapeHTML(featured.name)}</h1><p>${escapeHTML(featured.subtitle || "UNWRITTEN LEGEND")}</p></div><button class="ghost-button" data-edit="character:${featured.id}">EDIT CHARACTER</button></header><div class="panel-label"><div><span>VISUAL ARCHIVE</span><strong>CHARACTER PANELS</strong></div><p>PORTRAIT FORMAT · ${panels.length} / 08 ASSIGNED</p></div><div class="character-panel-grid">${panelSlots}</div></div></section>`;
+      ? `<button class="character-panel filled" data-art="${index}" aria-label="Open artwork ${index + 1}"><img src="${escapeHTML(panels[index])}" alt="${escapeHTML(featured.name)} character panel ${index + 1}" onerror="this.closest('.character-panel').classList.add('image-error')"><span class="panel-caption"><b>0${index + 1}</b> CHARACTER ART</span></button>`
+      : `<button class="character-panel empty" data-edit="character:${featured.id}" aria-label="Add artwork to portrait slot ${index + 1}"><span>0${index + 1}</span><i>＋</i><strong>PORTRAIT SLOT</strong><small>ADD ARTWORK IN EDIT</small></button>`).join("");
+    activeCharacterId = featured.id;
+    $("#workspaceView").innerHTML = `<section class="character-sheet" data-character-id="${escapeHTML(featured.id)}"><aside class="sheet-portrait" data-art="primary" tabindex="0" role="button" aria-label="Open primary portrait for ${escapeHTML(featured.name)}">${image(featured)}<div class="portrait-frame"></div><div class="portrait-index">PRIMARY <span>// PORTRAIT</span></div><div class="portrait-caption"><span>ACTIVE CHARACTER</span><strong>${escapeHTML(featured.meta || "LEVEL —")}</strong></div></aside><div class="sheet-content"><nav class="character-switcher" aria-label="Character roster"><span>ROSTER</span>${universe.characters.map((item) => `<button class="${item.id === featured.id ? "active" : ""}" data-detail="character:${item.id}" aria-pressed="${item.id === featured.id}">${image(item)}<span>${escapeHTML(item.name)}</span></button>`).join("")}<button class="add-character" data-create="character" aria-label="Create character">＋</button></nav><header class="sheet-heading"><div><span class="edition">CHARACTER SHEET // ${escapeHTML(featured.meta || "UNRANKED")}</span><h1>${escapeHTML(featured.name)}</h1><p>${escapeHTML(featured.subtitle || "UNWRITTEN LEGEND")}</p></div><button class="ghost-button" data-edit="character:${featured.id}">EDIT CHARACTER</button></header><div class="character-facts"><div><span>ORIGIN</span><strong>${escapeHTML(featured.origin || "Unknown origin")}</strong></div><div><span>CLASSIFICATION</span><strong>${escapeHTML(featured.subtitle || "Unclassified")}</strong></div><div><span>ARCHIVE ID</span><strong>${escapeHTML(featured.id)}</strong></div></div><section class="character-lore"><span>ARCHIVE LORE</span><p>${escapeHTML(featured.description || "No lore has been recorded for this character yet. Edit the sheet to begin their story.")}</p></section><div class="panel-label"><div><span>VISUAL ARCHIVE</span><strong>CHARACTER PANELS</strong></div><p>SELECT ART TO EXPAND · ${panels.length} / 08 ASSIGNED</p></div><div class="character-panel-grid">${panelSlots}</div></div></section>`;
   };
   const profileView = (type, id) => {
     const plural = `${type}s`, item = universe[plural].find((entry) => entry.id === id);
     if (!item) return navigate(plural);
-    const original = universe.characters.indexOf(item);
-    if (original > 0) universe.characters.unshift(...universe.characters.splice(original, 1));
+    activeCharacterId = item.id;
     currentDetail = null;
     collectionView("character");
   };
@@ -182,14 +185,16 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
     form.reset(); form.elements.type.value = type; form.elements.id.value = id;
     $("#entityModalTitle").textContent = `${id ? "Edit" : "Create"} ${type}`; $("#entityModalLabel").textContent = `${type.toUpperCase()} ARCHIVE`;
     if (item) {
-      ["name", "subtitle", "meta", "image", "description"].forEach((key) => { form.elements[key].value = item[key] || ""; });
+      ["name", "subtitle", "meta", "origin", "image", "description"].forEach((key) => { form.elements[key].value = item[key] || ""; });
       form.elements.gallery.value = (item.gallery || []).join("\n");
     }
     $("#entityModal").hidden = false; setTimeout(() => form.elements.name.focus(), 50);
   };
   const enterWorkspace = () => {
-    universe = { version: 2, characters: [], locations: [], ...sessionBridge.archive };
+    universe = { characters: [], locations: [], ...sessionBridge.archive, version: 3 };
     universe.characters ||= []; universe.locations ||= [];
+    universe.characters = universe.characters.map((character) => ({ ...character, origin: String(character.origin || "Unknown origin").trim() }));
+    activeCharacterId = universe.characters[0]?.id || null;
     workspaceShell(); $("#workspace").hidden = false; $("#success").hidden = true; navigate("characters");
   };
   const restoreCredentials = async () => {
@@ -223,21 +228,29 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
       const burst = document.createElement("span"); burst.className = "click-burst"; burst.style.left = `${event.clientX}px`; burst.style.top = `${event.clientY}px`;
       document.body.appendChild(burst); burst.addEventListener("animationend", () => burst.remove());
     }
-    const page = event.target.closest("[data-page]"), create = event.target.closest("[data-create]"), detail = event.target.closest("[data-detail]"), edit = event.target.closest("[data-edit]"), remove = event.target.closest("[data-delete]"), action = event.target.closest("[data-action]");
+    const page = event.target.closest("[data-page]"), create = event.target.closest("[data-create]"), detail = event.target.closest("[data-detail]"), edit = event.target.closest("[data-edit]"), art = event.target.closest("[data-art]"), remove = event.target.closest("[data-delete]"), action = event.target.closest("[data-action]");
     if (page && universe) navigate(page.dataset.page);
     if (create && universe) openEntityModal(create.dataset.create);
     if (detail && universe) { const [type, id] = detail.dataset.detail.split(":"); navigate(`${type}s`, id); }
     if (edit && universe) { const [type, id] = edit.dataset.edit.split(":"); openEntityModal(type, id); }
+    if (art && universe) openArtwork(art.dataset.art);
     if (action?.dataset.action === "close-modal") $("#entityModal").hidden = true;
+    if (action?.dataset.action === "close-lightbox") $("#artLightbox").hidden = true;
+    if (action?.dataset.action === "previous-art") stepArtwork(-1);
+    if (action?.dataset.action === "next-art") stepArtwork(1);
     if (remove && universe) { const [type, id] = remove.dataset.delete.split(":"); if (confirm("Archive this entry? This will save the removal to your bridge.")) { universe[`${type}s`] = universe[`${type}s`].filter((entry) => entry.id !== id); if (type === "location") universe.characters.forEach((character) => { character.relations = (character.relations || []).filter((relation) => relation !== id); }); navigate(`${type}s`); persist("ENTRY ARCHIVED · BRIDGE UPDATED"); } }
   });
   $("#entityModal").addEventListener("click", (event) => { if (event.target === $("#entityModal")) $("#entityModal").hidden = true; });
   $("#entityForm").addEventListener("submit", (event) => {
     event.preventDefault(); const data = new FormData(event.target), type = data.get("type"), id = data.get("id") || `${type[0]}${Date.now()}`, list = universe[`${type}s`], existing = list.find((entry) => entry.id === id);
-    const item = { ...existing, id, name: data.get("name").trim(), subtitle: data.get("subtitle").trim(), meta: data.get("meta").trim(), image: data.get("image").trim(), gallery: data.get("gallery").split(/\r?\n/).map((url) => url.trim()).filter(Boolean).slice(0, 8), description: data.get("description").trim() };
+    const item = { ...existing, id, name: data.get("name").trim(), subtitle: data.get("subtitle").trim(), meta: data.get("meta").trim(), origin: data.get("origin").trim(), image: data.get("image").trim(), gallery: data.get("gallery").split(/\r?\n/).map((url) => url.trim()).filter(Boolean).slice(0, 8), description: data.get("description").trim() };
     existing ? Object.assign(existing, item) : list.unshift(item);
     $("#entityModal").hidden = true; navigate(`${type}s`, id); persist(existing ? "PROFILE UPDATED · BRIDGE SAVED" : "NEW ENTRY CREATED · BRIDGE SAVED");
   });
-  document.addEventListener("keydown", (event) => { if (event.key === "Escape") $("#entityModal").hidden = true; });
+  const artworkUrls = () => { const character = universe?.characters.find((item) => item.id === activeCharacterId); return character ? [character.image || fallbackImage, ...(character.gallery || [])] : []; };
+  const showArtwork = () => { const urls = artworkUrls(), character = universe.characters.find((item) => item.id === activeCharacterId); if (!urls.length) return; lightboxIndex = (lightboxIndex + urls.length) % urls.length; $("#lightboxImage").src = urls[lightboxIndex]; $("#lightboxImage").alt = `${character.name} artwork ${lightboxIndex + 1}`; $("#lightboxIndex").textContent = `${String(lightboxIndex + 1).padStart(2, "0")} / ${String(urls.length).padStart(2, "0")}`; $("#lightboxCaption").textContent = `${character.name} · ${lightboxIndex ? "CHARACTER PANEL" : "PRIMARY PORTRAIT"}`; };
+  const openArtwork = (index) => { lightboxIndex = index === "primary" ? 0 : Number(index) + 1; showArtwork(); $("#artLightbox").hidden = false; };
+  const stepArtwork = (direction) => { if ($("#artLightbox").hidden) return; lightboxIndex += direction; showArtwork(); };
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape") { $("#entityModal").hidden = true; $("#artLightbox").hidden = true; } if (!$("#artLightbox").hidden && event.key === "ArrowLeft") stepArtwork(-1); if (!$("#artLightbox").hidden && event.key === "ArrowRight") stepArtwork(1); if ((event.key === "Enter" || event.key === " ") && event.target.matches(".sheet-portrait")) openArtwork("primary"); });
   restoreCredentials();
 }
