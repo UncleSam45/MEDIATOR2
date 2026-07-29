@@ -1,5 +1,3 @@
-"""Install Mediator 2 requirements and launch its single Electron instance."""
-
 from __future__ import annotations
 
 import os
@@ -12,13 +10,11 @@ ROOT = Path(__file__).resolve().parent
 
 
 def run(command: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
-    """Run a command from the application directory with useful console output."""
     print(f"[Mediator 2] {' '.join(command)}", flush=True)
     return subprocess.run(command, cwd=ROOT, check=check, text=True)
 
 
 def install_python_requirements() -> None:
-    """Install declared Python packages into the currently active environment."""
     requirements = ROOT / "requirements.txt"
     if requirements.exists() and requirements.read_text(encoding="utf-8").strip():
         run([sys.executable, "-m", "pip", "install", "-r", str(requirements)])
@@ -38,7 +34,6 @@ def npm_command() -> str:
 
 
 def terminate_electron_instances() -> None:
-    """Enforce a clean desktop session before Electron's own instance lock."""
     if os.name == "nt":
         subprocess.run(
             ["taskkill", "/F", "/T", "/IM", "electron.exe"],
@@ -56,7 +51,6 @@ def terminate_electron_instances() -> None:
 
 
 def install_electron_requirements(npm: str) -> None:
-    """Install exact npm dependencies when the local Electron binary is absent."""
     electron = ROOT / "node_modules" / ".bin" / (
         "electron.cmd" if os.name == "nt" else "electron"
     )

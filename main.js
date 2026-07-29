@@ -1,4 +1,3 @@
-/* Electron entrypoint and access-portal renderer for Mediator 2. */
 if (typeof require === "function" && typeof module !== "undefined" && module.exports) {
   const { app, BrowserWindow, ipcMain, safeStorage, shell } = require("electron");
   const fs = require("node:fs/promises");
