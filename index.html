@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08090b">
+  <title>Mediator 2 — Access Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="workspace.css">
+</head>
+<body>
+  <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
+  <div class="cursor-aura" aria-hidden="true"><i></i></div>
+  <div class="scroll-progress" aria-hidden="true"></div>
+  <div class="noise"></div>
+  <main class="portal-shell">
+    <section class="world-panel" aria-label="Mediator introduction">
+      <div class="titlebar-drag"></div>
+      <div class="brand"><span class="brand-mark"><i></i><i></i><i></i></span><span>MEDIATOR <b>2</b></span></div>
+      <div class="orbital-scene" aria-hidden="true">
+        <div class="scene-glow"></div>
+        <div class="scan-line"></div>
+        <div class="orbit orbit-one"><i></i><i></i></div>
+        <div class="orbit orbit-two"><i></i></div>
+        <div class="orbit orbit-three"><i></i><i></i><i></i></div>
+        <div class="planet"><span></span></div>
+        <div class="horizon"></div>
+      </div>
+      <div class="world-copy">
+        <span class="edition">UNIVERSE ARCHITECT · SECOND EDITION</span>
+        <h1 class="split-title">Every world<br>begins with a <em>door.</em></h1>
+        <p>Connect your private bridge and step inside the universe only you can build.</p>
+      </div>
+      <div class="system-status"><span></span> SYSTEM READY <i>02 / 02</i></div>
+    </section>
+
+    <section class="access-panel">
+      <div class="window-actions"><button id="minimize" aria-label="Minimize">—</button><button id="maximize" aria-label="Maximize">□</button><button id="closeWindow" aria-label="Close">×</button></div>
+      <div class="access-content">
+        <header>
+          <div class="step">ACCESS PORTAL <span>01</span></div>
+          <h2>Enter your universe.</h2>
+          <p>Your GitHub repository becomes a secure bridge for your world. Mediator reads and writes only the archive you choose.</p>
+        </header>
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="owner">GITHUB USERNAME</label>
+            <div class="input-wrap"><span class="input-icon">◎</span><input id="owner" name="owner" autocomplete="username" placeholder="octocat" required><i class="valid-dot"></i></div>
+          </div>
+          <div class="field">
+            <label for="repo">BRIDGE REPOSITORY</label>
+            <div class="input-wrap"><span class="input-icon branch">⌘</span><input id="repo" name="repo" autocomplete="off" placeholder="my-universe" required><i class="valid-dot"></i></div>
+          </div>
+          <div class="field">
+            <div class="label-row"><label for="token">FINE-GRAINED ACCESS TOKEN</label><a href="https://github.com/settings/personal-access-tokens/new" id="tokenHelp">Create token ↗</a></div>
+            <div class="input-wrap"><span class="input-icon">◇</span><input id="token" name="token" type="password" autocomplete="current-password" placeholder="github_pat_••••••••••••" required><button class="reveal" id="reveal" type="button" aria-label="Show token">◉</button></div>
+            <small>Requires <strong>Contents: Read and write</strong> permission for this repository.</small>
+          </div>
+          <label class="remember"><input id="remember" type="checkbox"><span class="checkbox">✓</span><span><strong>Remember this bridge</strong><small>Credentials are encrypted by your operating system.</small></span></label>
+          <div id="errorBox" class="error-box" role="alert" hidden></div>
+          <button class="enter-button" id="submitButton" type="submit"><span>CONNECT TO UNIVERSE</span><i>→</i><b class="loader"></b></button>
+          <button class="demo-button" id="demoButton" type="button"><span>EXPLORE THE DEMO UNIVERSE</span><i>↗</i></button>
+        </form>
+        <footer><span><i></i> Direct GitHub REST connection</span><button id="forgetButton" hidden>Forget saved access</button><b>v2.0.0 · LOCAL FIRST</b></footer>
+      </div>
+    </section>
+  </main>
+  <div id="success" class="success-screen" aria-live="polite" hidden>
+    <div class="success-ring"><span>✓</span></div><div class="edition">BRIDGE ESTABLISHED</div><h2 id="successTitle">Welcome, Architect.</h2><p id="successMessage"></p>
+  </div>
+  <div id="workspace" class="workspace" hidden></div>
+  <div id="entityModal" class="entity-modal" hidden>
+    <div class="entity-dialog" role="dialog" aria-modal="true" aria-labelledby="entityModalTitle">
+      <button class="dialog-close" data-action="close-modal" aria-label="Close">×</button>
+      <span class="edition" id="entityModalLabel">ARCHIVE ENTRY</span>
+      <h2 id="entityModalTitle">Create character</h2>
+      <p>Begin with the essentials. Your archive can grow alongside your world.</p>
+      <form id="entityForm">
+        <input type="hidden" name="type"><input type="hidden" name="id">
+        <label>NAME<input name="name" required placeholder="Name this entry"></label>
+        <div class="dialog-row"><label id="subtitleField">TITLE<input name="subtitle" placeholder="Role or classification"></label><label id="metaField">LEVEL<input name="meta" placeholder="Level 01"></label></div>
+        <label id="originField">ORIGIN<input name="origin" placeholder="World, city, faction, or birthplace"><small>Connect this entry to a place in your universe.</small></label>
+        <label>ARTWORK URL<input name="image" type="url" placeholder="https://…"></label>
+        <label>CHARACTER PANEL IMAGES<textarea name="gallery" rows="3" placeholder="One portrait image URL per line"></textarea><small>Optional. Add up to eight portrait-oriented images for the character sheet grid.</small></label>
+        <label>LORE<textarea name="description" rows="4" placeholder="Tell this part of the story…"></textarea></label>
+        <div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-modal">CANCEL</button><button class="primary-button" type="submit">SAVE TO UNIVERSE →</button></div>
+      </form>
+    </div>
+  </div>
+  <div id="artLightbox" class="art-lightbox" hidden role="dialog" aria-modal="true" aria-label="Character artwork viewer">
+    <button class="lightbox-close" data-action="close-lightbox" aria-label="Close artwork viewer">×</button>
+    <button class="lightbox-nav previous" data-action="previous-art" aria-label="Previous artwork">←</button>
+    <figure><img id="lightboxImage" alt=""><figcaption><span id="lightboxIndex"></span><strong id="lightboxCaption"></strong></figcaption></figure>
+    <button class="lightbox-nav next" data-action="next-art" aria-label="Next artwork">→</button>
+  </div>
+  <div id="workspaceToast" class="workspace-toast" role="status"></div>
+  <script src="main.js"></script>
+</body>
+</html>
