@@ -62,6 +62,7 @@
           <label class="remember"><input id="remember" type="checkbox"><span class="checkbox">✓</span><span><strong>Remember this bridge</strong><small>Credentials are encrypted by your operating system.</small></span></label>
           <div id="errorBox" class="error-box" role="alert" hidden></div>
           <button class="enter-button" id="submitButton" type="submit"><span>CONNECT TO UNIVERSE</span><i>→</i><b class="loader"></b></button>
+          <button class="demo-button" id="demoButton" type="button"><span>EXPLORE THE DEMO UNIVERSE</span><i>↗</i></button>
         </form>
         <footer><span><i></i> Direct GitHub REST connection</span><button id="forgetButton" hidden>Forget saved access</button><b>v2.0.0 · LOCAL FIRST</b></footer>
       </div>
@@ -81,7 +82,7 @@
         <input type="hidden" name="type"><input type="hidden" name="id">
         <label>NAME<input name="name" required placeholder="Name this entry"></label>
         <div class="dialog-row"><label id="subtitleField">TITLE<input name="subtitle" placeholder="Role or classification"></label><label id="metaField">LEVEL<input name="meta" placeholder="Level 01"></label></div>
-        <label>ORIGIN<input name="origin" required placeholder="World, city, faction, or birthplace"><small>Required for every character saved to the bridge archive.</small></label>
+        <label id="originField">ORIGIN<input name="origin" placeholder="World, city, faction, or birthplace"><small>Connect this entry to a place in your universe.</small></label>
         <label>ARTWORK URL<input name="image" type="url" placeholder="https://…"></label>
         <label>CHARACTER PANEL IMAGES<textarea name="gallery" rows="3" placeholder="One portrait image URL per line"></textarea><small>Optional. Add up to eight portrait-oriented images for the character sheet grid.</small></label>
         <label>LORE<textarea name="description" rows="4" placeholder="Tell this part of the story…"></textarea></label>

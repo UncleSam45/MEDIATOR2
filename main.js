@@ -43,214 +43,62 @@ if (typeof require === "function" && typeof module !== "undefined" && module.exp
   }
 } else {
   const $ = (selector) => document.querySelector(selector);
-  const form = $("#loginForm");
   const desktop = window.mediatorDesktop;
+  const form = $("#loginForm");
   let sessionBridge = null;
   let universe = null;
-  let currentPage = "characters";
-  let currentDetail = null;
-  let activeCharacterId = null;
-  let lightboxIndex = 0;
-  const fallbackImage = "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1400&q=85";
-
-  // A lightweight, dependency-free motion engine shared by the portal and archive.
-  const motionEnabled = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const title = $(".split-title");
-  title.innerHTML = `<span class="word" style="--i:0">Every</span> <span class="word" style="--i:1">world</span><br><span class="word" style="--i:2">begins</span> <span class="word" style="--i:3">with</span> <span class="word" style="--i:4">a</span> <em class="word" style="--i:5">door.</em>`;
+  let currentPage = "home";
+  const fallbackImages = {
+    character: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=85",
+    location: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=85",
+    map: "https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1400&q=85"
+  };
+  const demoArchive = {
+    version: 4,
+    identity: { name: "The Astral Verge", genre: "Science fantasy · Age of Embers", description: "A dying constellation bound together by ancient gates, wandering cities, and the people who remember how the stars once spoke.", image: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1800&q=90" },
+    characters: [
+      { id:"c1", name:"Ilyra Voss", subtitle:"Keeper of the Last Gate", meta:"ARCHIVE 01", origin:"Asterfall", image:"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1000&q=85", description:"An exile carrying a map written in light, Ilyra can hear the dormant gates beneath every city." },
+      { id:"c2", name:"Orin Vale", subtitle:"Celestial Cartographer", meta:"ARCHIVE 02", origin:"The Drift", image:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1000&q=85", description:"Orin charts paths through impossible space and erases every route that leads back to his past." },
+      { id:"c3", name:"Sera Nox", subtitle:"Ember Envoy", meta:"ARCHIVE 03", origin:"Veyra Prime", image:"https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1000&q=85", description:"A diplomat whose calm voice conceals the last living spark of a vanished sun." }
+    ],
+    locations: [
+      { id:"l1", name:"Asterfall", subtitle:"The Vertical City", meta:"CAPITAL", origin:"Cinder Reach", image:"https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1400&q=85", description:"A city suspended around a broken star-gate, where every district follows a different gravity." },
+      { id:"l2", name:"The Glass Expanse", subtitle:"Shattered moon desert", meta:"REGION", origin:"Veyra Prime", image:"https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=1400&q=85", description:"A silver desert that preserves the reflections of everyone who crosses it." }
+    ],
+    maps: [{ id:"m1", name:"The Cinder Reach", subtitle:"Primary stellar chart", meta:"7 MARKERS", origin:"Astral Verge", image:"https://images.unsplash.com/photo-1446776877081-d282a0f896e2?auto=format&fit=crop&w=1600&q=85", description:"The known passageways between the seven surviving systems." }],
+    modules: [{id:"timeline",name:"Chronicle",description:"Layer eras, events, and turning points across your universe.",status:"COMING SOON"},{id:"relations",name:"Constellation",description:"See characters, factions, and places as a living relationship network.",status:"COMING SOON"},{id:"languages",name:"Lexicon",description:"Build languages, scripts, naming systems, and translations.",status:"IN DEVELOPMENT"}]
+  };
+  const escapeHTML = (value) => String(value ?? "").replace(/[&<>'"]/g, (char) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
+  const pluralFor = (type) => type === "map" ? "maps" : `${type}s`;
+  const img = (item, type) => `<img src="${escapeHTML(item.image || fallbackImages[type])}" alt="${escapeHTML(item.name)}" onerror="this.src='${fallbackImages[type]}'">`;
+  const toast = (message) => { const el=$("#workspaceToast"); el.textContent=message; el.classList.add("show"); setTimeout(()=>el.classList.remove("show"),2200); };
+  const motionEnabled = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const title=$(".split-title"); title.innerHTML=`<span class="word" style="--i:0">Every</span> <span class="word" style="--i:1">world</span><br><span class="word" style="--i:2">begins</span> <span class="word" style="--i:3">with</span> <span class="word" style="--i:4">a</span> <em class="word" style="--i:5">door.</em>`;
   if (motionEnabled) {
-    const canvas = $("#starfield"), context = canvas.getContext("2d");
-    const pointer = { x: innerWidth / 2, y: innerHeight / 2, tx: innerWidth / 2, ty: innerHeight / 2 };
-    let stars = [];
-    const resizeField = () => {
-      const ratio = Math.min(devicePixelRatio || 1, 2);
-      canvas.width = innerWidth * ratio; canvas.height = innerHeight * ratio;
-      canvas.style.width = `${innerWidth}px`; canvas.style.height = `${innerHeight}px`;
-      context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      stars = Array.from({ length: Math.min(140, Math.floor(innerWidth / 10)) }, () => ({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, z: Math.random() * 1.5 + .2, size: Math.random() * 1.5 + .25 }));
-    };
-    const drawField = () => {
-      pointer.x += (pointer.tx - pointer.x) * .07; pointer.y += (pointer.ty - pointer.y) * .07;
-      context.clearRect(0, 0, innerWidth, innerHeight);
-      stars.forEach((star) => {
-        star.y -= star.z * .08; if (star.y < -3) star.y = innerHeight + 3;
-        const x = star.x + (pointer.x - innerWidth / 2) * star.z * -.018;
-        const y = star.y + (pointer.y - innerHeight / 2) * star.z * -.018;
-        context.beginPath(); context.arc(x, y, star.size * star.z, 0, Math.PI * 2);
-        context.fillStyle = `rgba(217,255,99,${.08 + star.z * .16})`; context.fill();
-      });
-      requestAnimationFrame(drawField);
-    };
-    const aura = $(".cursor-aura"), scene = $(".orbital-scene");
-    window.addEventListener("resize", resizeField);
-    document.addEventListener("pointermove", (event) => {
-      pointer.tx = event.clientX; pointer.ty = event.clientY;
-      aura.style.transform = `translate3d(${event.clientX - aura.offsetWidth / 2}px,${event.clientY - aura.offsetHeight / 2}px,0)`;
-      document.documentElement.style.setProperty("--mx", `${event.clientX / innerWidth * 100}%`);
-      document.documentElement.style.setProperty("--my", `${event.clientY / innerHeight * 100}%`);
-      if (scene && !$("#workspace").hidden) return;
-      if (scene) scene.style.transform = `translate(-50%,-50%) rotateX(${(event.clientY / innerHeight - .5) * -7}deg) rotateY(${(event.clientX / innerWidth - .5) * 9}deg)`;
-      const card = event.target.closest(".feature-card,.entity-card,.roster-card");
-      if (card) { const box = card.getBoundingClientRect(); card.style.transform = `perspective(900px) rotateX(${(event.clientY - box.top) / box.height * -7 + 3.5}deg) rotateY(${(event.clientX - box.left) / box.width * 8 - 4}deg) translateY(-3px)`; }
-    });
-    document.addEventListener("pointerover", (event) => { if (event.target.closest("button,a,input,.feature-card,.entity-card")) aura.classList.add("active"); });
-    document.addEventListener("pointerout", (event) => { aura.classList.remove("active"); const card = event.target.closest(".feature-card,.entity-card,.roster-card"); if (card) card.style.transform = ""; });
-    resizeField(); drawField();
+    const canvas=$("#starfield"), ctx=canvas.getContext("2d"); let stars=[];
+    const resize=()=>{ const d=Math.min(devicePixelRatio||1,2); canvas.width=innerWidth*d; canvas.height=innerHeight*d; ctx.setTransform(d,0,0,d,0,0); stars=Array.from({length:110},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,s:Math.random()*1.4+.3})); };
+    const draw=()=>{ctx.clearRect(0,0,innerWidth,innerHeight); stars.forEach(s=>{s.y-=s.s*.05;if(s.y<0)s.y=innerHeight;ctx.fillStyle=`rgba(217,255,99,${.08+s.s*.12})`;ctx.fillRect(s.x,s.y,s.s,s.s)});requestAnimationFrame(draw)}; resize();draw();addEventListener("resize",resize);
+    document.addEventListener("pointermove",e=>{const aura=$(".cursor-aura");aura.style.transform=`translate3d(${e.clientX-17}px,${e.clientY-17}px,0)`;document.documentElement.style.setProperty("--mx",`${e.clientX/innerWidth*100}%`);document.documentElement.style.setProperty("--my",`${e.clientY/innerHeight*100}%`)});
   }
-
-  const setLoading = (loading) => {
-    $("#submitButton").classList.toggle("loading", loading);
-    $("#submitButton").disabled = loading;
-    [...form.elements].forEach((element) => { if (element.id !== "remember") element.disabled = loading; });
-  };
-  const showError = (message) => { $("#errorBox").textContent = message; $("#errorBox").hidden = false; };
-  const request = async (path, credentials, options = {}) => {
-    const response = await fetch(`https://api.github.com${path}`, {
-      ...options,
-      headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${credentials.token}`, "X-GitHub-Api-Version": "2022-11-28", ...options.headers }
-    });
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({}));
-      throw new Error(body.message || `GitHub rejected the request (${response.status}).`);
-    }
-    return response.status === 204 ? null : response.json();
-  };
-  const connectBridge = async (credentials) => {
-    const base = `/repos/${encodeURIComponent(credentials.owner)}/${encodeURIComponent(credentials.repo)}`;
-    const repository = await request(base, credentials);
-    let archive = { version: 3, characters: [], locations: [], updatedAt: null };
-    try {
-      const file = await request(`${base}/contents/mediator/data.json`, credentials);
-      archive = JSON.parse(decodeURIComponent(escape(atob(file.content.replace(/\n/g, "")))));
-    } catch (error) {
-      if (!/Not Found/i.test(error.message)) throw error;
-    }
-    return { repository, archive, credentials };
-  };
-  window.mediatorBridge = {
-    get session() { return sessionBridge; },
-    async save(data) {
-      if (!sessionBridge) throw new Error("Connect a bridge before saving.");
-      const { credentials, repository } = sessionBridge;
-      const base = `/repos/${encodeURIComponent(credentials.owner)}/${encodeURIComponent(credentials.repo)}/contents/mediator/data.json`;
-      let sha;
-      try { sha = (await request(base, credentials)).sha; } catch (error) { if (!/Not Found/i.test(error.message)) throw error; }
-      const characters = (data.characters || []).map((character) => ({ ...character, origin: String(character.origin || "Unknown origin").trim() }));
-      const content = btoa(unescape(encodeURIComponent(JSON.stringify({ ...data, characters, version: 3, updatedAt: new Date().toISOString() }, null, 2))));
-      await request(base, credentials, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: "Update Mediator universe archive", content, branch: repository.default_branch, ...(sha && { sha }) }) });
-    }
-  };
-  const escapeHTML = (value) => String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
-  const image = (item) => `<img src="${escapeHTML(item.image || fallbackImage)}" alt="${escapeHTML(item.name)}" onerror="this.src='${fallbackImage}'">`;
-  const toast = (message) => { const element = $("#workspaceToast"); element.textContent = message; element.classList.add("show"); setTimeout(() => element.classList.remove("show"), 2400); };
-  const persist = async (message = "Universe saved to GitHub") => {
-    toast("SAVING TO BRIDGE…");
-    try { await window.mediatorBridge.save(universe); toast(message); }
-    catch (error) { toast(`SAVE FAILED · ${error.message}`); }
-  };
-  const workspaceShell = () => {
-    $("#workspace").innerHTML = `<main class="workspace-main"><header class="workspace-topbar"><div class="brand"><span class="brand-mark"><i></i><i></i><i></i></span><span>MEDIATOR <b>2</b></span></div><div class="character-status"><span></span><div><small>CHARACTER ARCHIVE</small><strong id="characterCount">0 CHARACTERS</strong></div></div><div class="topbar-actions"><div class="bridge-inline"><span>● BRIDGE ONLINE</span><small>${escapeHTML(sessionBridge.repository.full_name)}</small></div><button class="primary-button" data-create="character">＋ NEW CHARACTER</button></div></header><section id="workspaceView" class="workspace-view"></section></main>`;
-    const scroller = $(".workspace-main");
-    scroller.addEventListener("scroll", () => { const range = scroller.scrollHeight - scroller.clientHeight; $(".scroll-progress").style.width = `${range ? scroller.scrollTop / range * 100 : 0}%`; }, { passive: true });
-  };
-  const collectionView = (type, query = "") => {
-    const items = universe.characters.filter((item) => `${item.name} ${item.subtitle || ""}`.toLowerCase().includes(query.toLowerCase()));
-    const featured = items.find((item) => item.id === activeCharacterId) || items[0] || universe.characters[0];
-    if (!featured) {
-      $("#workspaceView").innerHTML = `<div class="empty-universe"><div><span class="edition">CHARACTER ARCHIVE // EMPTY</span><div class="empty-orb">＋</div><h2>Summon your first legend.</h2><p>Build a character sheet and begin assembling your roster.</p><button class="primary-button" data-create="character">CREATE FIRST CHARACTER →</button></div></div>`;
-      return;
-    }
-    const panels = (featured.gallery || []).slice(0, 8);
-    const panelSlots = Array.from({ length: 8 }, (_, index) => panels[index]
-      ? `<button class="character-panel filled" data-art="${index}" aria-label="Open artwork ${index + 1}"><img src="${escapeHTML(panels[index])}" alt="${escapeHTML(featured.name)} character panel ${index + 1}" onerror="this.closest('.character-panel').classList.add('image-error')"><span class="panel-caption"><b>0${index + 1}</b> CHARACTER ART</span></button>`
-      : `<button class="character-panel empty" data-edit="character:${featured.id}" aria-label="Add artwork to portrait slot ${index + 1}"><span>0${index + 1}</span><i>＋</i><strong>PORTRAIT SLOT</strong><small>ADD ARTWORK IN EDIT</small></button>`).join("");
-    activeCharacterId = featured.id;
-    $("#workspaceView").innerHTML = `<section class="character-sheet" data-character-id="${escapeHTML(featured.id)}"><aside class="sheet-portrait" data-art="primary" tabindex="0" role="button" aria-label="Open primary portrait for ${escapeHTML(featured.name)}">${image(featured)}<div class="portrait-frame"></div><div class="portrait-index">PRIMARY <span>// PORTRAIT</span></div><div class="portrait-caption"><span>ACTIVE CHARACTER</span><strong>${escapeHTML(featured.meta || "LEVEL —")}</strong></div></aside><div class="sheet-content"><nav class="character-switcher" aria-label="Character roster"><span>ROSTER</span>${universe.characters.map((item) => `<button class="${item.id === featured.id ? "active" : ""}" data-detail="character:${item.id}" aria-pressed="${item.id === featured.id}">${image(item)}<span>${escapeHTML(item.name)}</span></button>`).join("")}<button class="add-character" data-create="character" aria-label="Create character">＋</button></nav><header class="sheet-heading"><div><span class="edition">CHARACTER SHEET // ${escapeHTML(featured.meta || "UNRANKED")}</span><h1>${escapeHTML(featured.name)}</h1><p>${escapeHTML(featured.subtitle || "UNWRITTEN LEGEND")}</p></div><button class="ghost-button" data-edit="character:${featured.id}">EDIT CHARACTER</button></header><div class="character-facts"><div><span>ORIGIN</span><strong>${escapeHTML(featured.origin || "Unknown origin")}</strong></div><div><span>CLASSIFICATION</span><strong>${escapeHTML(featured.subtitle || "Unclassified")}</strong></div><div><span>ARCHIVE ID</span><strong>${escapeHTML(featured.id)}</strong></div></div><section class="character-lore"><span>ARCHIVE LORE</span><p>${escapeHTML(featured.description || "No lore has been recorded for this character yet. Edit the sheet to begin their story.")}</p></section><div class="panel-label"><div><span>VISUAL ARCHIVE</span><strong>CHARACTER PANELS</strong></div><p>SELECT ART TO EXPAND · ${panels.length} / 08 ASSIGNED</p></div><div class="character-panel-grid">${panelSlots}</div></div></section>`;
-  };
-  const profileView = (type, id) => {
-    const plural = `${type}s`, item = universe[plural].find((entry) => entry.id === id);
-    if (!item) return navigate(plural);
-    activeCharacterId = item.id;
-    currentDetail = null;
-    collectionView("character");
-  };
-  const navigate = (page, detailId = null) => {
-    currentPage = page; currentDetail = detailId;
-    const type = "character";
-    $("#characterCount").textContent = `${universe.characters.length} CHARACTER${universe.characters.length === 1 ? "" : "S"}`;
-    detailId ? profileView(type, detailId) : collectionView(type);
-    $(".workspace-main").scrollTo({ top: 0, behavior: "smooth" });
-  };
-  const openEntityModal = (type, id = "") => {
-    const form = $("#entityForm"), item = id ? universe[`${type}s`].find((entry) => entry.id === id) : null;
-    form.reset(); form.elements.type.value = type; form.elements.id.value = id;
-    $("#entityModalTitle").textContent = `${id ? "Edit" : "Create"} ${type}`; $("#entityModalLabel").textContent = `${type.toUpperCase()} ARCHIVE`;
-    if (item) {
-      ["name", "subtitle", "meta", "origin", "image", "description"].forEach((key) => { form.elements[key].value = item[key] || ""; });
-      form.elements.gallery.value = (item.gallery || []).join("\n");
-    }
-    $("#entityModal").hidden = false; setTimeout(() => form.elements.name.focus(), 50);
-  };
-  const enterWorkspace = () => {
-    universe = { characters: [], locations: [], ...sessionBridge.archive, version: 3 };
-    universe.characters ||= []; universe.locations ||= [];
-    universe.characters = universe.characters.map((character) => ({ ...character, origin: String(character.origin || "Unknown origin").trim() }));
-    activeCharacterId = universe.characters[0]?.id || null;
-    workspaceShell(); $("#workspace").hidden = false; $("#success").hidden = true; navigate("characters");
-  };
-  const restoreCredentials = async () => {
-    const saved = await desktop?.loadCredentials();
-    if (!saved) return;
-    $("#owner").value = saved.owner; $("#repo").value = saved.repo; $("#token").value = saved.token;
-    $("#remember").checked = true; $("#forgetButton").hidden = false;
-  };
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault(); $("#errorBox").hidden = true;
-    if (!form.reportValidity()) return;
-    const credentials = { owner: $("#owner").value.trim(), repo: $("#repo").value.trim(), token: $("#token").value.trim() };
-    setLoading(true);
-    try {
-      sessionBridge = await connectBridge(credentials);
-      if ($("#remember").checked) await desktop?.saveCredentials(credentials); else await desktop?.clearCredentials();
-      $("#successTitle").textContent = `Welcome, ${credentials.owner}.`;
-      $("#successMessage").textContent = `${sessionBridge.repository.full_name} is ready · ${sessionBridge.archive.characters?.length || 0} characters restored`;
-      $("#success").hidden = false;
-      setTimeout(enterWorkspace, 950);
-    } catch (error) { showError(error.message === "Bad credentials" ? "That token was not accepted. Check the token and its repository access." : error.message); }
-    finally { setLoading(false); }
-  });
-  $("#reveal").addEventListener("click", () => { const token = $("#token"); token.type = token.type === "password" ? "text" : "password"; });
-  $("#tokenHelp").addEventListener("click", (event) => { if (desktop) { event.preventDefault(); desktop.openExternal(event.currentTarget.href); } });
-  $("#minimize").addEventListener("click", () => desktop?.minimize());
-  $("#closeWindow").addEventListener("click", () => desktop?.close());
-  $("#forgetButton").addEventListener("click", async () => { await desktop?.clearCredentials(); form.reset(); $("#forgetButton").hidden = true; });
-  document.addEventListener("click", (event) => {
-    if (motionEnabled) {
-      const burst = document.createElement("span"); burst.className = "click-burst"; burst.style.left = `${event.clientX}px`; burst.style.top = `${event.clientY}px`;
-      document.body.appendChild(burst); burst.addEventListener("animationend", () => burst.remove());
-    }
-    const page = event.target.closest("[data-page]"), create = event.target.closest("[data-create]"), detail = event.target.closest("[data-detail]"), edit = event.target.closest("[data-edit]"), art = event.target.closest("[data-art]"), remove = event.target.closest("[data-delete]"), action = event.target.closest("[data-action]");
-    if (page && universe) navigate(page.dataset.page);
-    if (create && universe) openEntityModal(create.dataset.create);
-    if (detail && universe) { const [type, id] = detail.dataset.detail.split(":"); navigate(`${type}s`, id); }
-    if (edit && universe) { const [type, id] = edit.dataset.edit.split(":"); openEntityModal(type, id); }
-    if (art && universe) openArtwork(art.dataset.art);
-    if (action?.dataset.action === "close-modal") $("#entityModal").hidden = true;
-    if (action?.dataset.action === "close-lightbox") $("#artLightbox").hidden = true;
-    if (action?.dataset.action === "previous-art") stepArtwork(-1);
-    if (action?.dataset.action === "next-art") stepArtwork(1);
-    if (remove && universe) { const [type, id] = remove.dataset.delete.split(":"); if (confirm("Archive this entry? This will save the removal to your bridge.")) { universe[`${type}s`] = universe[`${type}s`].filter((entry) => entry.id !== id); if (type === "location") universe.characters.forEach((character) => { character.relations = (character.relations || []).filter((relation) => relation !== id); }); navigate(`${type}s`); persist("ENTRY ARCHIVED · BRIDGE UPDATED"); } }
-  });
-  $("#entityModal").addEventListener("click", (event) => { if (event.target === $("#entityModal")) $("#entityModal").hidden = true; });
-  $("#entityForm").addEventListener("submit", (event) => {
-    event.preventDefault(); const data = new FormData(event.target), type = data.get("type"), id = data.get("id") || `${type[0]}${Date.now()}`, list = universe[`${type}s`], existing = list.find((entry) => entry.id === id);
-    const item = { ...existing, id, name: data.get("name").trim(), subtitle: data.get("subtitle").trim(), meta: data.get("meta").trim(), origin: data.get("origin").trim(), image: data.get("image").trim(), gallery: data.get("gallery").split(/\r?\n/).map((url) => url.trim()).filter(Boolean).slice(0, 8), description: data.get("description").trim() };
-    existing ? Object.assign(existing, item) : list.unshift(item);
-    $("#entityModal").hidden = true; navigate(`${type}s`, id); persist(existing ? "PROFILE UPDATED · BRIDGE SAVED" : "NEW ENTRY CREATED · BRIDGE SAVED");
-  });
-  const artworkUrls = () => { const character = universe?.characters.find((item) => item.id === activeCharacterId); return character ? [character.image || fallbackImage, ...(character.gallery || [])] : []; };
-  const showArtwork = () => { const urls = artworkUrls(), character = universe.characters.find((item) => item.id === activeCharacterId); if (!urls.length) return; lightboxIndex = (lightboxIndex + urls.length) % urls.length; $("#lightboxImage").src = urls[lightboxIndex]; $("#lightboxImage").alt = `${character.name} artwork ${lightboxIndex + 1}`; $("#lightboxIndex").textContent = `${String(lightboxIndex + 1).padStart(2, "0")} / ${String(urls.length).padStart(2, "0")}`; $("#lightboxCaption").textContent = `${character.name} · ${lightboxIndex ? "CHARACTER PANEL" : "PRIMARY PORTRAIT"}`; };
-  const openArtwork = (index) => { lightboxIndex = index === "primary" ? 0 : Number(index) + 1; showArtwork(); $("#artLightbox").hidden = false; };
-  const stepArtwork = (direction) => { if ($("#artLightbox").hidden) return; lightboxIndex += direction; showArtwork(); };
-  document.addEventListener("keydown", (event) => { if (event.key === "Escape") { $("#entityModal").hidden = true; $("#artLightbox").hidden = true; } if (!$("#artLightbox").hidden && event.key === "ArrowLeft") stepArtwork(-1); if (!$("#artLightbox").hidden && event.key === "ArrowRight") stepArtwork(1); if ((event.key === "Enter" || event.key === " ") && event.target.matches(".sheet-portrait")) openArtwork("primary"); });
-  restoreCredentials();
+  const request = async (path, credentials, options={}) => { const response=await fetch(`https://api.github.com${path}`,{...options,headers:{Accept:"application/vnd.github+json",Authorization:`Bearer ${credentials.token}`,"X-GitHub-Api-Version":"2022-11-28",...options.headers}}); if(!response.ok){const body=await response.json().catch(()=>({}));throw new Error(body.message||`GitHub rejected the request (${response.status}).`)} return response.status===204?null:response.json(); };
+  const connectBridge = async credentials => { const base=`/repos/${encodeURIComponent(credentials.owner)}/${encodeURIComponent(credentials.repo)}`; const repository=await request(base,credentials); let archive={version:4,identity:{name:credentials.repo,description:"A universe waiting to be discovered."},characters:[],locations:[],maps:[],modules:demoArchive.modules}; try{const file=await request(`${base}/contents/mediator/data.json`,credentials);archive=JSON.parse(decodeURIComponent(escape(atob(file.content.replace(/\\n/g,"")))))}catch(error){if(!/Not Found/i.test(error.message))throw error} return{repository,archive,credentials}; };
+  const persist = async message => { if(sessionBridge?.demo){toast(message||"CHANGES SAVED FOR THIS DEMO SESSION");return} toast("SAVING TO BRIDGE…"); try { const {credentials,repository}=sessionBridge, base=`/repos/${encodeURIComponent(credentials.owner)}/${encodeURIComponent(credentials.repo)}/contents/mediator/data.json`; let sha; try{sha=(await request(base,credentials)).sha}catch(e){if(!/Not Found/i.test(e.message))throw e} const content=btoa(unescape(encodeURIComponent(JSON.stringify({...universe,version:4,updatedAt:new Date().toISOString()},null,2)))); await request(base,credentials,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:"Update Mediator universe archive",content,branch:repository.default_branch,...(sha&&{sha})})});toast(message||"UNIVERSE SAVED") } catch(error){toast(`SAVE FAILED · ${error.message}`)} };
+  const navItems=[['home','⌂','Home'],['characters','◉','Characters'],['locations','◇','Locations'],['maps','⌖','Maps'],['universe','✦','Universe'],['tools','＋','Tools']];
+  const shell=()=>{$("#workspace").innerHTML=`<aside class="console-rail"><div class="brand"><span class="brand-mark"><i></i><i></i><i></i></span><span>MEDIATOR <b>2</b></span></div><nav>${navItems.map(([id,icon,label])=>`<button data-page="${id}" aria-label="${label}"><i>${icon}</i><span>${label}</span></button>`).join('')}</nav><div class="rail-status"><i></i><span>${sessionBridge.demo?'LOCAL DEMO':'BRIDGE ONLINE'}</span><small>${escapeHTML(sessionBridge.repository.full_name)}</small></div></aside><main class="console-main"><header class="console-top"><div><small>ACTIVE UNIVERSE</small><strong>${escapeHTML(universe.identity.name)}</strong></div><div class="console-clock"><span id="liveClock"></span><button data-action="command" aria-label="Open quick actions">⌘ K</button></div></header><section id="workspaceView" class="workspace-view"></section></main>`; setInterval(()=>{const c=$("#liveClock");if(c)c.textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})},1000);};
+  const stat=(value,label)=>`<div class="universe-stat"><strong>${value}</strong><span>${label}</span></div>`;
+  const homeView=()=>{const i=universe.identity;$("#workspaceView").innerHTML=`<section class="home-hero">${img(i,'map')}<div class="hero-shade"></div><div class="hero-code">UNIVERSE // ${escapeHTML(i.genre||'UNCLASSIFIED')}</div><div class="hero-copy"><span class="edition">WELCOME BACK, ARCHITECT</span><h1>${escapeHTML(i.name)}</h1><p>${escapeHTML(i.description)}</p><button class="primary-button" data-page="universe">ENTER UNIVERSE →</button></div><div class="hero-stats">${stat(universe.characters.length,'CHARACTERS')}${stat(universe.locations.length,'LOCATIONS')}${stat(universe.maps.length,'MAPS')}</div></section><div class="section-head"><div><span class="edition">CONTINUE BUILDING</span><h2>Your universe is in motion.</h2></div><small>SELECT AN ARCHIVE TO EXPAND</small></div><div class="archive-launchers">${[['characters','◉','People & identities',universe.characters.length],['locations','◇','Places & regions',universe.locations.length],['maps','⌖','World surfaces',universe.maps.length],['tools','＋','Optional systems',universe.modules.length]].map(([p,ic,sub,count],n)=>`<button data-page="${p}"><span>0${n+1}</span><i>${ic}</i><div><strong>${p.toUpperCase()}</strong><small>${sub}</small></div><b>${count}</b><em>→</em></button>`).join('')}</div>`};
+  const archiveView=(type)=>{const plural=pluralFor(type),items=universe[plural]||[],label=plural.toUpperCase();$("#workspaceView").innerHTML=`<header class="archive-heading"><div><span class="edition">${label} // ${String(items.length).padStart(2,'0')} ENTRIES</span><h1>${type==='character'?'People shape every world.':type==='location'?'Every place holds a story.':'Chart the unknown.'}</h1><p>${type==='map'?'Upload visual foundations and prepare them for future interactive markers.':'Build rich profiles, then connect them across your living universe.'}</p></div><button class="primary-button" data-create="${type}">＋ NEW ${type.toUpperCase()}</button></header>${items.length?`<div class="cinematic-grid">${items.map(item=>`<article class="cinematic-card" data-detail="${type}:${item.id}">${img(item,type)}<div><span>${escapeHTML(item.meta||'ARCHIVE ENTRY')}</span><h2>${escapeHTML(item.name)}</h2><p>${escapeHTML(item.subtitle||item.origin||'Unclassified')}</p></div><i>EXPLORE →</i></article>`).join('')}<button class="create-card" data-create="${type}"><b>＋</b><span>ADD TO ${label}</span></button></div>`:`<div class="empty-universe"><div><div class="empty-orb">＋</div><h2>Discover your first ${type}.</h2><p>Start with a name. The details can emerge later.</p><button class="primary-button" data-create="${type}">CREATE ENTRY →</button></div></div>`}`};
+  const detailView=(type,id)=>{const item=(universe[pluralFor(type)]||[]).find(x=>x.id===id);if(!item)return archiveView(type); const connected=type==='character'?universe.locations.filter(l=>l.name===item.origin):universe.characters.filter(c=>c.origin===item.name);$("#workspaceView").innerHTML=`<button class="back-link" data-page="${pluralFor(type)}">← ${pluralFor(type).toUpperCase()}</button><section class="codex-profile"><div class="codex-art">${img(item,type)}<span>${escapeHTML(item.meta||'ARCHIVE ENTRY')}</span></div><div class="codex-copy"><span class="edition">${type.toUpperCase()} CODEX // ${escapeHTML(item.id)}</span><h1>${escapeHTML(item.name)}</h1><h3>${escapeHTML(item.subtitle||'Unclassified')}</h3><div class="codex-rule"></div><small>ORIGIN / PARENT</small><strong>${escapeHTML(item.origin||'Not yet connected')}</strong><p>${escapeHTML(item.description||'No lore has been recorded yet. Every world begins with a few unwritten lines.')}</p><div class="profile-actions"><button class="primary-button" data-edit="${type}:${item.id}">EDIT ENTRY</button><button class="ghost-button danger" data-delete="${type}:${item.id}">ARCHIVE</button></div>${connected.length?`<div class="linked-entries"><span>CONNECTED ENTRIES</span>${connected.map(x=>`<b>${escapeHTML(x.name)}</b>`).join('')}</div>`:''}</div></section>`};
+  const universeView=()=>{const i=universe.identity;$("#workspaceView").innerHTML=`<section class="identity-page"><div class="identity-art">${img(i,'map')}</div><div class="identity-copy"><span class="edition">UNIVERSE IDENTITY</span><h1>${escapeHTML(i.name)}</h1><h3>${escapeHTML(i.genre||'Genre and era unwritten')}</h3><p>${escapeHTML(i.description)}</p><div class="identity-totals">${stat(universe.characters.length,'CHARACTERS')}${stat(universe.locations.length,'LOCATIONS')}${stat(universe.maps.length,'MAPS')}</div><button class="primary-button" data-action="edit-universe">EDIT UNIVERSE IDENTITY</button></div></section>`};
+  const toolsView=()=>{$("#workspaceView").innerHTML=`<header class="archive-heading"><div><span class="edition">SYSTEM LIBRARY // MODULE FRAMEWORK</span><h1>Expand only when you choose.</h1><p>Your core universe stays simple. Modules add specialized systems without crowding your creative space.</p></div><div class="catalog-status"><i></i> CATALOGUE SYNCHRONIZED</div></header><nav class="tool-tabs"><button class="active">DISCOVER</button><button>INSTALLED <b>0</b></button><button>UPDATES <b>0</b></button></nav><div class="module-feature"><div><span class="edition">MODULE SYSTEM // READY</span><h2>New dimensions are on the horizon.</h2><p>The architecture is active and waiting for its first expansions. Your existing archives remain complete and independent.</p></div><strong>CORE v2.0<br><small>COMPATIBLE</small></strong></div><div class="module-grid">${universe.modules.map((m,n)=>`<article><span>0${n+1} // ${m.status}</span><i>${['⌁','◎','Aa'][n]}</i><h3>${m.name}</h3><p>${m.description}</p><button disabled>NOTIFY WHEN READY</button></article>`).join('')}</div>`};
+  const navigate=(page,detail)=>{currentPage=page;document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(detail){const [type,id]=detail;detailView(type,id)}else if(page==='home')homeView();else if(['characters','locations','maps'].includes(page))archiveView(page.slice(0,-1));else if(page==='universe')universeView();else toolsView();$(".console-main")?.scrollTo({top:0,behavior:'smooth'});};
+  const openModal=(type,id='')=>{const item=id?(universe[pluralFor(type)]||[]).find(x=>x.id===id):null,f=$("#entityForm");f.reset();f.elements.type.value=type;f.elements.id.value=id;$("#entityModalTitle").textContent=`${id?'Edit':'Create'} ${type}`;$("#entityModalLabel").textContent=`${type.toUpperCase()} ARCHIVE`;$("#subtitleField").firstChild.textContent=type==='location'?'TYPE':type==='map'?'MAP TYPE':'TITLE';$("#metaField").firstChild.textContent=type==='character'?'CLASSIFICATION':'STATUS';$("#originField").firstChild.textContent=type==='character'?'ORIGIN':'PARENT REGION';if(item)['name','subtitle','meta','origin','image','description'].forEach(k=>f.elements[k].value=item[k]||'');$("#entityModal").hidden=false;setTimeout(()=>f.elements.name.focus(),30)};
+  const enter=(archive,session)=>{sessionBridge=session;universe={identity:{name:'Untitled Universe'},characters:[],locations:[],maps:[],modules:demoArchive.modules,...archive};universe.modules||=demoArchive.modules;shell();$("#workspace").hidden=false;$("#success").hidden=true;navigate('home')};
+  form.addEventListener('submit',async e=>{e.preventDefault();if(!form.reportValidity())return;const button=$("#submitButton"),credentials={owner:$("#owner").value.trim(),repo:$("#repo").value.trim(),token:$("#token").value.trim()};button.classList.add('loading');try{const session=await connectBridge(credentials);if($("#remember").checked)await desktop?.saveCredentials(credentials);$("#successTitle").textContent=`Welcome, ${credentials.owner}.`;$("#successMessage").textContent=`${session.repository.full_name} is ready`;$("#success").hidden=false;setTimeout(()=>enter(session.archive,session),700)}catch(error){$("#errorBox").textContent=error.message;$("#errorBox").hidden=false}finally{button.classList.remove('loading')}});
+  $("#demoButton").addEventListener('click',()=>{const archive=JSON.parse(JSON.stringify(demoArchive));enter(archive,{demo:true,repository:{full_name:'LOCAL / THE-ASTRAL-VERGE'}})});
+  $("#reveal").addEventListener('click',()=>{$("#token").type=$("#token").type==='password'?'text':'password'});$("#minimize").addEventListener('click',()=>desktop?.minimize());$("#closeWindow").addEventListener('click',()=>desktop?.close());$("#tokenHelp").addEventListener('click',e=>{if(desktop){e.preventDefault();desktop.openExternal(e.currentTarget.href)}});$("#forgetButton").addEventListener('click',async()=>{await desktop?.clearCredentials();form.reset()});
+  document.addEventListener('click',e=>{const page=e.target.closest('[data-page]'),detail=e.target.closest('[data-detail]'),create=e.target.closest('[data-create]'),edit=e.target.closest('[data-edit]'),remove=e.target.closest('[data-delete]'),action=e.target.closest('[data-action]');if(page&&universe)navigate(page.dataset.page);if(detail&&universe)navigate(currentPage,detail.dataset.detail.split(':'));if(create&&universe)openModal(create.dataset.create);if(edit&&universe){const [t,id]=edit.dataset.edit.split(':');openModal(t,id)}if(remove&&confirm('Archive this entry?')){const[t,id]=remove.dataset.delete.split(':');universe[pluralFor(t)]=universe[pluralFor(t)].filter(x=>x.id!==id);navigate(pluralFor(t));persist('ENTRY ARCHIVED')}if(action?.dataset.action==='close-modal')$("#entityModal").hidden=true;if(action?.dataset.action==='edit-universe')toast('UNIVERSE IDENTITY EDITOR · NEXT FOUNDATION UPDATE')});
+  $("#entityForm").addEventListener('submit',e=>{e.preventDefault();const d=new FormData(e.target),type=d.get('type'),list=universe[pluralFor(type)],id=d.get('id')||`${type[0]}${Date.now()}`,old=list.find(x=>x.id===id),item={...old,id,name:d.get('name').trim(),subtitle:d.get('subtitle').trim(),meta:d.get('meta').trim(),origin:d.get('origin').trim(),image:d.get('image').trim(),description:d.get('description').trim()};old?Object.assign(old,item):list.unshift(item);$("#entityModal").hidden=true;navigate(pluralFor(type),[type,id]);persist(old?'ENTRY UPDATED':'NEW ENTRY DISCOVERED')});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')$("#entityModal").hidden=true});
+  (async()=>{const saved=await desktop?.loadCredentials();if(saved){$("#owner").value=saved.owner;$("#repo").value=saved.repo;$("#token").value=saved.token;$("#remember").checked=true;$("#forgetButton").hidden=false}})();
 }
