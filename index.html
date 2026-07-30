@@ -83,8 +83,8 @@
         <label>NAME<input name="name" required placeholder="Name this entry"></label>
         <div class="dialog-row"><label id="subtitleField">TITLE<input name="subtitle" placeholder="Role or classification"></label><label id="metaField">ARCHIVE LABEL<input name="meta" placeholder="Optional label or status"></label></div>
         <label id="originField">ORIGIN<input name="origin" placeholder="World, city, faction, or birthplace"><small>Connect this entry to a place in your universe.</small></label>
-        <label>ARTWORK URL<input name="image" type="url" placeholder="https://…"></label>
-        <label id="galleryField">CHARACTER GALLERY<textarea name="gallery" rows="3" placeholder="One image URL per line"></textarea><small>Optional. Add up to eight images to the character sheet.</small></label>
+        <label>ARTWORK<input name="image" type="text" inputmode="url" placeholder="https://…"><input name="imageFile" type="file" accept="image/jpeg,image/png,image/webp"><small>Choose a JPG, PNG, or WebP to resize and back up to your bridge (maximum 1600px).</small></label>
+        <label id="galleryField">CHARACTER GALLERY<textarea name="gallery" rows="3" placeholder="One image URL per line"></textarea><input name="galleryFiles" type="file" accept="image/jpeg,image/png,image/webp" multiple><small>Optional. Select or link up to eight images; selected files are compressed and bridge-backed.</small></label>
         <label>LORE<textarea name="description" rows="4" placeholder="Tell this part of the story…"></textarea></label>
         <div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-modal">CANCEL</button><button class="primary-button" type="submit">SAVE TO UNIVERSE →</button></div>
       </form>
@@ -98,6 +98,23 @@
   </div>
   <div id="workspaceToast" class="workspace-toast" role="status"></div>
   <div id="addonInstall" class="addon-install" hidden aria-live="polite"></div>
+  <div id="seasonModal" class="entity-modal" hidden>
+    <div class="entity-dialog season-dialog" role="dialog" aria-modal="true" aria-labelledby="seasonModalTitle">
+      <button class="dialog-close" data-action="close-season-modal" aria-label="Close">×</button>
+      <span class="edition">SEASONS // NEW ERA</span><h2 id="seasonModalTitle">Launch a creative season.</h2>
+      <p>Give this chapter an identity. Everything you build while it is active will become part of its Chronicle.</p>
+      <form id="seasonForm">
+        <div class="dialog-row"><label>SEASON NUMBER<input name="number" type="number" min="1" required></label><label>GENERAL THEME<input name="theme" required placeholder="Rebirth, discovery, rebellion…"></label></div>
+        <label>SEASON NAME<input name="name" required placeholder="The Age of Embers"></label>
+        <label>DESCRIPTION<textarea name="description" rows="4" placeholder="What will define this chapter?"></textarea></label>
+        <label>COVER IMAGE<input name="cover" type="file" accept="image/jpeg,image/png,image/webp"><small>Compressed to a repository-friendly WebP before bridge backup.</small></label>
+        <label>TRAILER SOURCE<select name="trailerType"><option value="none">No trailer</option><option value="external">External video URL</option><option value="local">Local video (this computer only)</option></select></label>
+        <label class="trailer-url" hidden>EXTERNAL URL<input name="trailerUrl" type="url" placeholder="https://youtube.com/…"></label>
+        <label class="trailer-local" hidden>LOCAL VIDEO<input name="trailerFile" type="file" accept="video/*"><small>The video and its path never enter your bridge archive.</small></label>
+        <div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-season-modal">CANCEL</button><button class="primary-button" type="submit">BEGIN THE SEASON →</button></div>
+      </form>
+    </div>
+  </div>
   <script src="main.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, webUtils } = require("electron");
 
 contextBridge.exposeInMainWorld("mediatorDesktop", {
   minimize: () => ipcRenderer.invoke("window:minimize"),
@@ -12,4 +12,9 @@ contextBridge.exposeInMainWorld("mediatorDesktop", {
   installAddon: (id) => ipcRenderer.invoke("addons:install", id),
   chooseAudiobookLibrary: () => ipcRenderer.invoke("audiobooks:choose"),
   scanAudiobooks: (path) => ipcRenderer.invoke("audiobooks:scan", path),
+  chooseSeasonTrailer: () => ipcRenderer.invoke("seasons:choose-trailer"),
+  localFileUrl: (file) => {
+    const path = webUtils.getPathForFile(file);
+    return path ? `file://${path.split("\\").join("/")}` : "";
+  },
 });
