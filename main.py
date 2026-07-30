@@ -33,23 +33,6 @@ def npm_command() -> str:
     return path
 
 
-def terminate_electron_instances() -> None:
-    if os.name == "nt":
-        subprocess.run(
-            ["taskkill", "/F", "/T", "/IM", "electron.exe"],
-            check=False,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-    else:
-        subprocess.run(
-            ["pkill", "-f", "[e]lectron"],
-            check=False,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-
-
 def install_electron_requirements(npm: str) -> None:
     electron = ROOT / "node_modules" / ".bin" / (
         "electron.cmd" if os.name == "nt" else "electron"
@@ -61,7 +44,6 @@ def install_electron_requirements(npm: str) -> None:
 
 
 def main() -> int:
-    terminate_electron_instances()
     install_python_requirements()
     npm = npm_command()
     install_electron_requirements(npm)
