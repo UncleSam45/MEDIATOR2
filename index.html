@@ -81,10 +81,10 @@
       <form id="entityForm">
         <input type="hidden" name="type"><input type="hidden" name="id">
         <label>NAME<input name="name" required placeholder="Name this entry"></label>
-        <div class="dialog-row"><label id="subtitleField">TITLE<input name="subtitle" placeholder="Role or classification"></label><label id="metaField">LEVEL<input name="meta" placeholder="Level 01"></label></div>
+        <div class="dialog-row"><label id="subtitleField">TITLE<input name="subtitle" placeholder="Role or classification"></label><label id="metaField">ARCHIVE LABEL<input name="meta" placeholder="Optional label or status"></label></div>
         <label id="originField">ORIGIN<input name="origin" placeholder="World, city, faction, or birthplace"><small>Connect this entry to a place in your universe.</small></label>
         <label>ARTWORK URL<input name="image" type="url" placeholder="https://…"></label>
-        <label>CHARACTER PANEL IMAGES<textarea name="gallery" rows="3" placeholder="One portrait image URL per line"></textarea><small>Optional. Add up to eight portrait-oriented images for the character sheet grid.</small></label>
+        <label id="galleryField">CHARACTER GALLERY<textarea name="gallery" rows="3" placeholder="One image URL per line"></textarea><small>Optional. Add up to eight images to the character sheet.</small></label>
         <label>LORE<textarea name="description" rows="4" placeholder="Tell this part of the story…"></textarea></label>
         <div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-modal">CANCEL</button><button class="primary-button" type="submit">SAVE TO UNIVERSE →</button></div>
       </form>
