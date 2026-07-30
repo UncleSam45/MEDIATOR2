@@ -382,7 +382,7 @@ button.command-tile { color: white; text-align: left; cursor: pointer; }
 .season-onboard p { max-width:650px;color:#959c9f;font-size:17px;line-height:1.7; }
 .season-sigil { width:120px;height:120px;border:1px solid #d9ff63;border-radius:50%;display:grid;place-items:center;font:700 48px Manrope;color:#d9ff63;box-shadow:0 0 70px rgba(217,255,99,.18);animation:seasonPulse 4s ease-in-out infinite; }
 .season-hero { min-height:600px;position:relative;overflow:hidden;border-radius:3px;display:flex;align-items:flex-end; }
-.season-hero>img { position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;animation:seasonDrift 18s ease-in-out infinite alternate; }
+.season-hero>img { position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;object-position:center top;animation:seasonDrift 18s ease-in-out infinite alternate; }
 .season-hero-copy { position:relative;z-index:2;padding:70px;max-width:760px; }
 .season-hero-copy>span,.chronicle-card span { color:#d9ff63;font-size:11px;letter-spacing:.2em;text-transform:uppercase; }
 .season-hero-copy h1 { font-size:clamp(54px,7vw,96px);line-height:.92;margin:13px 0;letter-spacing:-.06em; }
@@ -393,8 +393,9 @@ button.command-tile { color: white; text-align: left; cursor: pointer; }
 .season-stat-grid div { padding:24px;border-right:1px solid rgba(255,255,255,.08); }
 .season-stat-grid strong { display:block;font-size:27px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
 .season-stat-grid span { font-size:9px;letter-spacing:.16em;color:#7f8789; }
-.season-trailer { padding:28px;background:#111519;border-left:2px solid #d9ff63;margin-bottom:45px;display:flex;align-items:center;gap:20px; }
-.season-trailer video { max-width:620px;width:70%; }
+.season-media-preview{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}.season-media-preview>div>span{display:block;margin-bottom:8px;color:#727a7c;font:600 8px Manrope;letter-spacing:.14em}.season-media-preview>div>div{height:160px;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:#0b0e11;display:grid;place-items:center}.season-media-preview img,.season-media-preview video,.season-media-preview iframe{width:100%;height:100%;object-fit:cover;border:0}.media-placeholder,.season-media-preview>div>div:has(>i){color:#687071;text-align:center;align-content:center;gap:8px}.media-placeholder i,.season-media-preview i{font-style:normal;color:#d9ff63;font-size:25px}.media-placeholder small,.season-media-preview small{display:block;font-size:9px}
+.season-trailer { padding:28px;background:#111519;border-left:2px solid #d9ff63;margin-bottom:45px;display:grid;gap:18px; }
+.season-trailer header{display:flex;align-items:center;justify-content:space-between;gap:20px}.season-trailer header>span{color:#d9ff63;font:600 9px Manrope;letter-spacing:.16em}.season-trailer header>a{color:#aeb4ae;font:600 8px Manrope;letter-spacing:.1em;text-decoration:none}.season-trailer video,.season-trailer iframe{display:block;width:100%;max-height:620px;aspect-ratio:16/9;border:0;background:#060708}.season-trailer .media-placeholder{min-height:220px;border:1px dashed rgba(255,255,255,.12)}
 .chronicle-heading { display:flex;justify-content:space-between;align-items:end;margin-bottom:20px; }
 .chronicle-heading h2 { font-size:38px;margin:8px 0; }
 .chronicle-controls { display:flex;justify-content:space-between;gap:15px;margin-bottom:25px; }
@@ -420,4 +421,4 @@ button.command-tile { color: white; text-align: left; cursor: pointer; }
 @keyframes seasonDrift { to{transform:scale(1.04) translate3d(-1%,1%,0)} }
 @keyframes chronicleReveal { from{opacity:0;transform:translateY(18px)} }
 @media (prefers-reduced-motion:reduce){.season-sigil,.season-hero>img,.chronicle-card{animation:none!important}}
-@media(max-width:800px){.season-hero-copy{padding:35px}.season-stat-grid{grid-template-columns:repeat(2,1fr)}.chronicle-controls{display:grid}.chronicle-card{grid-template-columns:90px 1fr}}
+@media(max-width:800px){.season-hero-copy{padding:35px}.season-stat-grid{grid-template-columns:repeat(2,1fr)}.chronicle-controls{display:grid}.chronicle-card{grid-template-columns:90px 1fr}.season-media-preview{grid-template-columns:1fr}}
