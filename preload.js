@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld("mediatorDesktop", {
   saveCredentials: (credentials) => ipcRenderer.invoke("credentials:save", credentials),
   clearCredentials: () => ipcRenderer.invoke("credentials:clear"),
   addonState: () => ipcRenderer.invoke("addons:state"),
+  loadCharacterSeasonMemory: () => ipcRenderer.invoke("character-season-memory:load"),
+  saveCharacterSeasonMemory: (memory) => ipcRenderer.invoke("character-season-memory:save", memory),
   installAddon: (id) => ipcRenderer.invoke("addons:install", id),
   chooseAudiobookLibrary: () => ipcRenderer.invoke("audiobooks:choose"),
   scanAudiobooks: (path) => ipcRenderer.invoke("audiobooks:scan", path),
