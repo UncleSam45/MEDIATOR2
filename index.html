@@ -108,15 +108,22 @@
         <label>SEASON NAME<input name="name" required placeholder="The Age of Embers"></label>
         <label>DESCRIPTION<textarea name="description" rows="4" placeholder="What will define this chapter?"></textarea></label>
         <label>COVER IMAGE<input name="cover" type="file" accept="image/jpeg,image/png,image/webp"><small>Compressed to a repository-friendly WebP before bridge backup.</small></label>
-        <label>TRAILER SOURCE<select name="trailerType"><option value="none">No trailer</option><option value="external">External video URL</option><option value="local">Local video (this computer only)</option></select></label>
-        <label class="trailer-url" hidden>EXTERNAL URL<input name="trailerUrl" type="url" placeholder="https://youtube.com/…"></label>
-        <label class="trailer-local" hidden>LOCAL VIDEO<input name="trailerFile" type="file" accept="video/*"><small>The video and its path never enter your bridge archive.</small></label>
+        <input name="trailerType" type="hidden" value="external">
+        <label class="trailer-url">STREAMABLE TRAILER URL<input name="trailerUrl" type="url" required placeholder="https://streamable.com/e/… or https://cdn…streamable.com/video/mp4/….mp4"><small>Paste the embed URL or direct CDN MP4. Mediator stores only this URL; videos must be hosted by Streamable.</small></label>
         <section class="season-media-preview" aria-live="polite">
           <div class="season-cover-preview"><span>COVER PREVIEW</span><div><i>◇</i><small>Your cover will appear here.</small></div></div>
           <div class="season-trailer-preview"><span>TRAILER PREVIEW</span><div><i>▶</i><small>Choose a trailer source to preview it.</small></div></div>
         </section>
         <div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-season-modal">CANCEL</button><button class="primary-button" type="submit">BEGIN THE SEASON →</button></div>
       </form>
+    </div>
+  </div>
+  <div id="trailerSettingsModal" class="entity-modal" hidden>
+    <div class="entity-dialog trailer-settings-dialog" role="dialog" aria-modal="true" aria-labelledby="trailerSettingsTitle">
+      <button class="dialog-close" data-action="close-trailer-settings" aria-label="Close">×</button>
+      <span class="edition">SEASON MEDIA // STREAMABLE</span><h2 id="trailerSettingsTitle">Change trailer URL.</h2>
+      <p>Replace the hosted trailer without changing the rest of the season.</p>
+      <form id="trailerSettingsForm"><input name="seasonId" type="hidden"><label>STREAMABLE URL<input name="trailerUrl" type="url" required placeholder="https://streamable.com/e/…"><small>Embed URLs are recommended; signed CDN URLs can expire.</small></label><section class="season-trailer-preview"><span>TRAILER PREVIEW</span><div><i>▶</i><small>Paste a Streamable URL to preview it.</small></div></section><div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-trailer-settings">CANCEL</button><button class="primary-button" type="submit">SAVE VIDEO URL →</button></div></form>
     </div>
   </div>
   <script src="main.js"></script>
