@@ -1,4 +1,5 @@
 const { contextBridge, ipcRenderer, webUtils } = require("electron");
+const { pathToFileURL } = require("node:url");
 
 contextBridge.exposeInMainWorld("mediatorDesktop", {
   minimize: () => ipcRenderer.invoke("window:minimize"),
@@ -17,6 +18,6 @@ contextBridge.exposeInMainWorld("mediatorDesktop", {
   chooseSeasonTrailer: () => ipcRenderer.invoke("seasons:choose-trailer"),
   localFileUrl: (file) => {
     const path = webUtils.getPathForFile(file);
-    return path ? `file://${path.split("\\").join("/")}` : "";
+    return path ? pathToFileURL(path).href : "";
   },
 });
