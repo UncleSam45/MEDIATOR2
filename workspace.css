@@ -405,6 +405,11 @@ button.command-tile { color: white; text-align: left; cursor: pointer; }
 .chronicle-card>div { padding:25px 30px; }
 .chronicle-card h3 { font-size:24px;margin:8px 0; }
 .chronicle-card p,.chronicle-card time { color:#858b8e;font-size:12px; }
+.chronicle-card.has-long-description p { display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;line-height:1.65;white-space:pre-wrap; }
+.chronicle-card.description-expanded p { display:block;overflow:visible;-webkit-line-clamp:unset;line-clamp:unset; }
+.chronicle-expand { display:block;margin:10px 0 12px;padding:0;border:0;background:none;color:#d9ff63;font:600 8px Manrope;letter-spacing:1.2px;cursor:pointer; }
+.chronicle-expand:hover { color:#fff; }
+.chronicle-card time { display:block; }
 .chronicle-card.major { min-height:220px;border-color:rgba(217,255,99,.4);box-shadow:inset 0 0 50px rgba(217,255,99,.04); }
 .season-empty { text-align:center;padding:65px;color:#858b8e;border:1px dashed rgba(255,255,255,.12); }
 .season-archive-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px; }
