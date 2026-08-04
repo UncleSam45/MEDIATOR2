@@ -1,1 +1,0 @@
-# Mediator 2 currently uses only the Python standard library.
