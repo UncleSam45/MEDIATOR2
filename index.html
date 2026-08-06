@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08090b">
+  <title>Mediator 2 — Access Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="workspace.css">
+</head>
+<body>
+  <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
+  <div class="cursor-aura" aria-hidden="true"><i></i></div>
+  <div class="scroll-progress" aria-hidden="true"></div>
+  <div class="noise"></div>
+  <main class="portal-shell">
+    <section class="world-panel" aria-label="Mediator introduction">
+      <div class="titlebar-drag"></div>
+      <div class="brand"><span class="brand-mark"><i></i><i></i><i></i></span><span>MEDIATOR <b>2</b></span></div>
+      <div class="orbital-scene" aria-hidden="true">
+        <div class="scene-glow"></div>
+        <div class="scan-line"></div>
+        <div class="orbit orbit-one"><i></i><i></i></div>
+        <div class="orbit orbit-two"><i></i></div>
+        <div class="orbit orbit-three"><i></i><i></i><i></i></div>
+        <div class="planet"><span></span></div>
+        <div class="horizon"></div>
+      </div>
+      <div class="world-copy">
+        <span class="edition">UNIVERSE ARCHITECT · SECOND EDITION</span>
+        <h1 class="split-title">Every world<br>begins with a <em>door.</em></h1>
+        <p>Connect your private bridge and step inside the universe only you can build.</p>
+      </div>
+      <div class="system-status"><span></span> SYSTEM READY <i>02 / 02</i></div>
+    </section>
+
+    <section class="access-panel">
+      <div class="window-actions"><button id="minimize" aria-label="Minimize">—</button><button id="maximize" aria-label="Maximize">□</button><button id="closeWindow" aria-label="Close">×</button></div>
+      <div class="access-content">
+        <header>
+          <div class="step">ACCESS PORTAL <span>01</span></div>
+          <h2>Enter your universe.</h2>
+          <p>Your GitHub repository becomes a secure bridge for your world. Mediator reads and writes only the archive you choose.</p>
+        </header>
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="owner">GITHUB USERNAME</label>
+            <div class="input-wrap"><span class="input-icon">◎</span><input id="owner" name="owner" autocomplete="username" placeholder="octocat" required><i class="valid-dot"></i></div>
+          </div>
+          <div class="field">
+            <label for="repo">BRIDGE REPOSITORY</label>
+            <div class="input-wrap"><span class="input-icon branch">⌘</span><input id="repo" name="repo" autocomplete="off" placeholder="my-universe" required><i class="valid-dot"></i></div>
+          </div>
+          <div class="field">
+            <div class="label-row"><label for="token">FINE-GRAINED ACCESS TOKEN</label><a href="https://github.com/settings/personal-access-tokens/new" id="tokenHelp">Create token ↗</a></div>
+            <div class="input-wrap"><span class="input-icon">◇</span><input id="token" name="token" type="password" autocomplete="current-password" placeholder="github_pat_••••••••••••" required><button class="reveal" id="reveal" type="button" aria-label="Show token">◉</button></div>
+            <small>Requires <strong>Contents: Read and write</strong> permission for this repository.</small>
+          </div>
+          <label class="remember"><input id="remember" type="checkbox"><span class="checkbox">✓</span><span><strong>Remember this bridge</strong><small><span id="credentialStorageNote">Credentials are encrypted by your operating system.</span></small></span></label>
+          <div id="errorBox" class="error-box" role="alert" hidden></div>
+          <button class="enter-button" id="submitButton" type="submit"><span>CONNECT TO UNIVERSE</span><i>→</i><b class="loader"></b></button>
+          <button class="demo-button" id="demoButton" type="button"><span>EXPLORE THE DEMO UNIVERSE</span><i>↗</i></button>
+        </form>
+        <footer><span><i></i> Direct GitHub REST connection</span><button id="forgetButton" hidden>Forget saved access</button><b>v2.0.0 · LOCAL FIRST</b></footer>
+      </div>
+    </section>
+  </main>
+  <div id="success" class="success-screen" aria-live="polite" hidden>
+    <div class="success-ring"><span>✓</span></div><div class="edition">BRIDGE ESTABLISHED</div><h2 id="successTitle">Welcome, Architect.</h2><p id="successMessage"></p>
+  </div>
+  <div id="workspace" class="workspace" hidden></div>
+  <div id="entityModal" class="entity-modal" hidden>
+    <div class="entity-dialog" role="dialog" aria-modal="true" aria-labelledby="entityModalTitle">
+      <button class="dialog-close" data-action="close-modal" aria-label="Close">×</button>
+      <span class="edition" id="entityModalLabel">ARCHIVE ENTRY</span>
+      <h2 id="entityModalTitle">Create character</h2>
+      <p>Begin with the essentials. Your archive can grow alongside your world.</p>
+      <form id="entityForm">
+        <input type="hidden" name="type"><input type="hidden" name="id">
+        <label>NAME<input name="name" required placeholder="Name this entry"></label>
+        <div class="dialog-row"><label id="subtitleField">TITLE<input name="subtitle" placeholder="Role or classification"></label><label id="metaField">ARCHIVE LABEL<input name="meta" placeholder="Optional label or status"></label></div>
+        <label id="originField">ORIGIN<input name="origin" placeholder="World, city, faction, or birthplace"><small>Connect this entry to a place in your universe.</small></label>
+        <label>ARTWORK<input name="image" type="text" inputmode="url" placeholder="https://…"><input name="imageFile" type="file" accept="image/jpeg,image/png,image/webp"><small>Choose a JPG, PNG, or WebP to resize and back up to your bridge (maximum 1600px).</small></label>
+        <label id="galleryField">CHARACTER GALLERY<textarea name="gallery" rows="3" placeholder="One image URL per line"></textarea><input name="galleryFiles" type="file" accept="image/jpeg,image/png,image/webp" multiple><small>Optional. Select or link up to eight images; selected files are compressed and bridge-backed.</small></label>
+        <label>LORE<textarea name="description" rows="4" placeholder="Tell this part of the story…"></textarea></label>
+        <div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-modal">CANCEL</button><button class="primary-button" type="submit">SAVE TO UNIVERSE →</button></div>
+      </form>
+    </div>
+  </div>
+  <div id="artLightbox" class="art-lightbox" hidden role="dialog" aria-modal="true" aria-label="Character artwork viewer">
+    <button class="lightbox-close" data-action="close-lightbox" aria-label="Close artwork viewer">×</button>
+    <button class="lightbox-nav previous" data-action="previous-art" aria-label="Previous artwork">←</button>
+    <figure><img id="lightboxImage" alt=""><figcaption><span id="lightboxIndex"></span><strong id="lightboxCaption"></strong></figcaption></figure>
+    <button class="lightbox-nav next" data-action="next-art" aria-label="Next artwork">→</button>
+  </div>
+  <div id="workspaceToast" class="workspace-toast" role="status"></div>
+  <div id="addonInstall" class="addon-install" hidden aria-live="polite"></div>
+  <div id="seasonModal" class="entity-modal" hidden>
+    <div class="entity-dialog season-dialog" role="dialog" aria-modal="true" aria-labelledby="seasonModalTitle">
+      <button class="dialog-close" data-action="close-season-modal" aria-label="Close">×</button>
+      <span class="edition">SEASONS // NEW ERA</span><h2 id="seasonModalTitle">Launch a creative season.</h2>
+      <p>Give this chapter an identity. Everything you build while it is active will become part of its Chronicle.</p>
+      <form id="seasonForm">
+        <div class="dialog-row"><label>SEASON NUMBER<input name="number" type="number" min="1" required></label><label>GENERAL THEME<input name="theme" required placeholder="Rebirth, discovery, rebellion…"></label></div>
+        <label>SEASON NAME<input name="name" required placeholder="The Age of Embers"></label>
+        <label>DESCRIPTION<textarea name="description" rows="4" placeholder="What will define this chapter?"></textarea></label>
+        <label>COVER IMAGE<input name="cover" type="file" accept="image/jpeg,image/png,image/webp"><small>Compressed to a repository-friendly WebP before bridge backup.</small></label>
+        <input name="trailerType" type="hidden" value="external">
+        <label class="trailer-url">STREAMABLE TRAILER URL<input name="trailerUrl" type="url" required placeholder="https://streamable.com/e/… or https://cdn…streamable.com/video/mp4/….mp4"><small>Paste the embed URL or direct CDN MP4. Mediator stores only this URL; videos must be hosted by Streamable.</small></label>
+        <section class="season-media-preview" aria-live="polite">
+          <div class="season-cover-preview"><span>COVER PREVIEW</span><div><i>◇</i><small>Your cover will appear here.</small></div></div>
+          <div class="season-trailer-preview"><span>TRAILER PREVIEW</span><div><i>▶</i><small>Choose a trailer source to preview it.</small></div></div>
+        </section>
+        <div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-season-modal">CANCEL</button><button class="primary-button" type="submit">BEGIN THE SEASON →</button></div>
+      </form>
+    </div>
+  </div>
+  <div id="trailerSettingsModal" class="entity-modal" hidden>
+    <div class="entity-dialog trailer-settings-dialog" role="dialog" aria-modal="true" aria-labelledby="trailerSettingsTitle">
+      <button class="dialog-close" data-action="close-trailer-settings" aria-label="Close">×</button>
+      <span class="edition">SEASON MEDIA // STREAMABLE</span><h2 id="trailerSettingsTitle">Change trailer URL.</h2>
+      <p>Replace the hosted trailer without changing the rest of the season.</p>
+      <form id="trailerSettingsForm"><input name="seasonId" type="hidden"><label>STREAMABLE URL<input name="trailerUrl" type="url" required placeholder="https://streamable.com/e/…"><small>Embed URLs are recommended; signed CDN URLs can expire.</small></label><section class="season-trailer-preview"><span>TRAILER PREVIEW</span><div><i>▶</i><small>Paste a Streamable URL to preview it.</small></div></section><div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-trailer-settings">CANCEL</button><button class="primary-button" type="submit">SAVE VIDEO URL →</button></div></form>
+    </div>
+  </div>
+  <div id="promoModal" class="entity-modal" hidden>
+    <div class="entity-dialog promo-dialog" role="dialog" aria-modal="true" aria-labelledby="promoModalTitle">
+      <button class="dialog-close" data-action="close-promo-modal" aria-label="Close">×</button>
+      <span class="edition">PROMO // NEW TRANSMISSION</span><h2 id="promoModalTitle">Broadcast your universe.</h2>
+      <p>Publish a compact announcement, news story, or premiere. The newest video becomes your PROMO banner automatically.</p>
+      <form id="promoForm">
+        <label>TITLE<input name="title" required maxlength="120" placeholder="A new signal has arrived"></label>
+        <label>STORY<textarea name="body" rows="6" required maxlength="3000" placeholder="Tell your audience what is happening in your universe…"></textarea></label>
+        <label>STREAMABLE VIDEO URL<input name="videoUrl" type="url" required placeholder="https://streamable.com/…"><small>Streamable page, embed, and CDN MP4 URLs are accepted. Expired broadcasts move into the archive automatically.</small></label>
+        <section class="promo-video-preview" aria-live="polite"><i>▶</i><small>Your transmission preview will appear here.</small></section>
+        <div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-promo-modal">CANCEL</button><button class="primary-button" type="submit">PUBLISH TRANSMISSION →</button></div>
+      </form>
+    </div>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>

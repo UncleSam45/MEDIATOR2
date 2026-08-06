@@ -1,0 +1,54 @@
+from __future__ import annotations
+
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parent
+
+
+def run(command: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
+    print(f"[Mediator 2] {' '.join(command)}", flush=True)
+    return subprocess.run(command, cwd=ROOT, check=check, text=True)
+
+
+def install_python_requirements() -> None:
+    requirements = ROOT / "requirements.txt"
+    if requirements.exists() and requirements.read_text(encoding="utf-8").strip():
+        run([sys.executable, "-m", "pip", "install", "-r", str(requirements)])
+    else:
+        print("[Mediator 2] No Python packages are currently required.")
+
+
+def npm_command() -> str:
+    executable = "npm.cmd" if os.name == "nt" else "npm"
+    path = shutil.which(executable)
+    if not path:
+        raise SystemExit(
+            "Node.js and npm are required to run Mediator 2. Install the current "
+            "Node.js LTS release, then launch main.py again."
+        )
+    return path
+
+
+def install_electron_requirements(npm: str) -> None:
+    electron = ROOT / "node_modules" / ".bin" / (
+        "electron.cmd" if os.name == "nt" else "electron"
+    )
+    if not electron.exists():
+        run([npm, "install", "--no-audit", "--no-fund"])
+    else:
+        print("[Mediator 2] Electron requirements are already installed.")
+
+
+def main() -> int:
+    install_python_requirements()
+    npm = npm_command()
+    install_electron_requirements(npm)
+    return run([npm, "start"], check=False).returncode
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
