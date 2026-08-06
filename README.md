@@ -38,7 +38,8 @@ The current codebase demonstrates:
 - detection of some character changes made outside the running application;
 - local audiobook folder scanning and playback on desktop;
 - audiobook progress, checkpoints, bookmarks, and season associations;
-- optional prototype add-on states for Seasons and Audiobooks.
+- optional prototype add-on states for Seasons and Audiobooks;
+- an installable PROMO add-on for bridge-backed announcements with Streamable video, a latest-video banner, newest-first publishing, and automatic 90-day archiving;
 
 These capabilities describe the current experiment, not a finalized feature set.
 

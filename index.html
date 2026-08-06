@@ -126,6 +126,20 @@
       <form id="trailerSettingsForm"><input name="seasonId" type="hidden"><label>STREAMABLE URL<input name="trailerUrl" type="url" required placeholder="https://streamable.com/e/…"><small>Embed URLs are recommended; signed CDN URLs can expire.</small></label><section class="season-trailer-preview"><span>TRAILER PREVIEW</span><div><i>▶</i><small>Paste a Streamable URL to preview it.</small></div></section><div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-trailer-settings">CANCEL</button><button class="primary-button" type="submit">SAVE VIDEO URL →</button></div></form>
     </div>
   </div>
+  <div id="promoModal" class="entity-modal" hidden>
+    <div class="entity-dialog promo-dialog" role="dialog" aria-modal="true" aria-labelledby="promoModalTitle">
+      <button class="dialog-close" data-action="close-promo-modal" aria-label="Close">×</button>
+      <span class="edition">PROMO // NEW TRANSMISSION</span><h2 id="promoModalTitle">Broadcast your universe.</h2>
+      <p>Publish a compact announcement, news story, or premiere. The newest video becomes your PROMO banner automatically.</p>
+      <form id="promoForm">
+        <label>TITLE<input name="title" required maxlength="120" placeholder="A new signal has arrived"></label>
+        <label>STORY<textarea name="body" rows="6" required maxlength="3000" placeholder="Tell your audience what is happening in your universe…"></textarea></label>
+        <label>STREAMABLE VIDEO URL<input name="videoUrl" type="url" required placeholder="https://streamable.com/…"><small>Streamable page, embed, and CDN MP4 URLs are accepted. Expired broadcasts move into the archive automatically.</small></label>
+        <section class="promo-video-preview" aria-live="polite"><i>▶</i><small>Your transmission preview will appear here.</small></section>
+        <div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-promo-modal">CANCEL</button><button class="primary-button" type="submit">PUBLISH TRANSMISSION →</button></div>
+      </form>
+    </div>
+  </div>
   <script src="main.js"></script>
 </body>
 </html>
