@@ -126,6 +126,30 @@
       <form id="trailerSettingsForm"><input name="seasonId" type="hidden"><label>STREAMABLE URL<input name="trailerUrl" type="url" required placeholder="https://streamable.com/e/…"><small>Embed URLs are recommended; signed CDN URLs can expire.</small></label><section class="season-trailer-preview"><span>TRAILER PREVIEW</span><div><i>▶</i><small>Paste a Streamable URL to preview it.</small></div></section><div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-trailer-settings">CANCEL</button><button class="primary-button" type="submit">SAVE VIDEO URL →</button></div></form>
     </div>
   </div>
+  <div id="questModal" class="entity-modal" hidden>
+    <div class="entity-dialog quest-dialog" role="dialog" aria-modal="true" aria-labelledby="questModalTitle">
+      <button class="dialog-close" data-action="close-quest-modal" aria-label="Close">×</button>
+      <span class="edition">QUEST SYSTEM // MISSION CONTROL</span><h2 id="questModalTitle">Create a quest.</h2>
+      <p>Define the call to adventure, its objectives, and the people or places caught in its orbit.</p>
+      <form id="questForm"><input name="id" type="hidden">
+        <label>QUEST TITLE<input name="title" required maxlength="120" placeholder="The gate beneath Asterfall"></label>
+        <div class="dialog-row"><label>TYPE<select name="type"><option>Main quest</option><option>Side quest</option><option>Character arc</option><option>World event</option></select></label><label>PRIORITY<select name="priority"><option value="low">LOW</option><option value="normal" selected>NORMAL</option><option value="high">HIGH</option><option value="critical">CRITICAL</option></select></label><label>STATUS<select name="status"><option value="active">ACTIVE</option><option value="completed">COMPLETED</option><option value="failed">FAILED</option><option value="archived">ARCHIVED</option></select></label></div>
+        <label>BRIEFING<textarea name="summary" rows="3" placeholder="What is at stake?"></textarea></label>
+        <label>OBJECTIVES<textarea name="objectives" rows="5" placeholder="[ ] Find the dormant gate&#10;[x] Decode the star map"></textarea><small>One objective per line. Prefix completed objectives with [x].</small></label>
+        <div class="dialog-row"><label>RELATED CHARACTERS<select name="characterIds" multiple size="4"></select></label><label>RELATED LOCATIONS<select name="locationIds" multiple size="4"></select></label></div>
+        <label>KEEPER NOTES<textarea name="notes" rows="3" placeholder="Private context, clues, or next steps…"></textarea></label>
+        <div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-quest-modal">CANCEL</button><button class="primary-button" type="submit">SAVE QUEST →</button></div>
+      </form>
+    </div>
+  </div>
+  <div id="journalModal" class="entity-modal" hidden>
+    <div class="entity-dialog journal-dialog" role="dialog" aria-modal="true" aria-labelledby="journalModalTitle">
+      <button class="dialog-close" data-action="close-journal-modal" aria-label="Close">×</button>
+      <span class="edition">JOURNAL // PERMANENT RECORD</span><h2 id="journalModalTitle">Write in the journal.</h2>
+      <p>Preserve discoveries and consequences alongside the universe that made them matter.</p>
+      <form id="journalForm"><input name="id" type="hidden"><label>ENTRY TITLE<input name="title" required maxlength="120" placeholder="What we found beyond the gate"></label><div class="dialog-row"><label>ENTRY TYPE<select name="mood"><option>Field note</option><option>Discovery</option><option>Reflection</option><option>Warning</option><option>Chronicle</option></select></label><label>LINKED QUEST<select name="questId"><option value="">NO LINKED QUEST</option></select></label></div><label>ENTRY<textarea name="body" required rows="10" maxlength="8000" placeholder="Record what happened…"></textarea></label><div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-journal-modal">CANCEL</button><button class="primary-button" type="submit">COMMIT TO JOURNAL →</button></div></form>
+    </div>
+  </div>
   <div id="promoModal" class="entity-modal" hidden>
     <div class="entity-dialog promo-dialog" role="dialog" aria-modal="true" aria-labelledby="promoModalTitle">
       <button class="dialog-close" data-action="close-promo-modal" aria-label="Close">×</button>
