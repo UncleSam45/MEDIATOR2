@@ -142,6 +142,15 @@
       </form>
     </div>
   </div>
+  <div id="seasonCardModal" class="entity-modal" hidden>
+    <div class="entity-dialog season-card-dialog" role="dialog" aria-modal="true" aria-labelledby="seasonCardTitle">
+      <button class="dialog-close" data-action="close-season-card" aria-label="Close">×</button>
+      <span class="edition">SEASON QUEST // FINAL RITUAL</span><h2 id="seasonCardTitle">Unlock the season card.</h2>
+      <p>Upload the official character card to complete this level quest. The artwork will be compressed and preserved in your Bridge repository.</p>
+      <form id="seasonCardForm"><input name="questId" type="hidden"><label>SEASON CHARACTER CARD<input name="card" type="file" accept="image/jpeg,image/png,image/webp" required><small>JPG, PNG, or WebP · maximum dimension 1600px after processing.</small></label><div class="season-card-preview"><span>◇</span><small>CARD PREVIEW</small></div><div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-season-card">CANCEL</button><button class="primary-button" type="submit">UNLOCK CHARACTER →</button></div></form>
+    </div>
+  </div>
+  <div id="questUnlock" class="quest-unlock" hidden aria-live="assertive"></div>
   <div id="journalModal" class="entity-modal" hidden>
     <div class="entity-dialog journal-dialog" role="dialog" aria-modal="true" aria-labelledby="journalModalTitle">
       <button class="dialog-close" data-action="close-journal-modal" aria-label="Close">×</button>
