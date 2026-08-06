@@ -82,6 +82,7 @@
         <input type="hidden" name="type"><input type="hidden" name="id">
         <label>NAME<input name="name" required placeholder="Name this entry"></label>
         <div class="dialog-row"><label id="subtitleField">TITLE<input name="subtitle" placeholder="Role or classification"></label><label id="metaField">ARCHIVE LABEL<input name="meta" placeholder="Optional label or status"></label></div>
+        <label id="seasonLevelField" hidden>SEASON LEVEL<input name="seasonLevel" type="number" min="0" step="1" placeholder="0"><small>Changing this value automatically issues a new character-card unlock quest.</small></label>
         <label id="originField">ORIGIN<input name="origin" placeholder="World, city, faction, or birthplace"><small>Connect this entry to a place in your universe.</small></label>
         <label>ARTWORK<input name="image" type="text" inputmode="url" placeholder="https://…"><input name="imageFile" type="file" accept="image/jpeg,image/png,image/webp"><small>Choose a JPG, PNG, or WebP to resize and back up to your bridge (maximum 1600px).</small></label>
         <label id="galleryField">CHARACTER GALLERY<textarea name="gallery" rows="3" placeholder="One image URL per line"></textarea><input name="galleryFiles" type="file" accept="image/jpeg,image/png,image/webp" multiple><small>Optional. Select or link up to eight images; selected files are compressed and bridge-backed.</small></label>
@@ -142,6 +143,15 @@
       </form>
     </div>
   </div>
+  <div id="seasonCardModal" class="entity-modal" hidden>
+    <div class="entity-dialog season-card-dialog" role="dialog" aria-modal="true" aria-labelledby="seasonCardTitle">
+      <button class="dialog-close" data-action="close-season-card" aria-label="Close">×</button>
+      <span class="edition">SEASON QUEST // FINAL RITUAL</span><h2 id="seasonCardTitle">Unlock the season card.</h2>
+      <p>Upload the official character card to complete this level quest. The artwork will be compressed and preserved in your Bridge repository.</p>
+      <form id="seasonCardForm"><input name="questId" type="hidden"><label>SEASON CHARACTER CARD<input name="card" type="file" accept="image/jpeg,image/png,image/webp" required><small>JPG, PNG, or WebP · maximum dimension 1600px after processing.</small></label><div class="season-card-preview"><span>◇</span><small>CARD PREVIEW</small></div><div class="dialog-actions"><button type="button" class="ghost-button" data-action="close-season-card">CANCEL</button><button class="primary-button" type="submit">UNLOCK CHARACTER →</button></div></form>
+    </div>
+  </div>
+  <div id="questUnlock" class="quest-unlock" hidden aria-live="assertive"></div>
   <div id="journalModal" class="entity-modal" hidden>
     <div class="entity-dialog journal-dialog" role="dialog" aria-modal="true" aria-labelledby="journalModalTitle">
       <button class="dialog-close" data-action="close-journal-modal" aria-label="Close">×</button>
