@@ -43,31 +43,38 @@
         <header>
           <div class="step">ACCESS PORTAL <span>01</span></div>
           <h2>Enter your universe.</h2>
-          <p>Your GitHub repository becomes a secure bridge for your world. Mediator reads and writes only the archive you choose.</p>
+          <p>Your server becomes a secure bridge for your world. Mediator reads and writes only the archive you choose.</p>
         </header>
         <form id="loginForm" novalidate>
           <div class="field">
-            <label for="owner">GITHUB USERNAME</label>
-            <div class="input-wrap"><span class="input-icon">◎</span><input id="owner" name="owner" autocomplete="username" placeholder="octocat" required><i class="valid-dot"></i></div>
+            <label for="repo">SERVER</label>
+            <div class="input-wrap"><span class="input-icon branch">⌘</span><input id="repo" name="server" autocomplete="off" placeholder="AWAITING SERVER" required><i class="valid-dot"></i></div>
           </div>
           <div class="field">
-            <label for="repo">BRIDGE REPOSITORY</label>
-            <div class="input-wrap"><span class="input-icon branch">⌘</span><input id="repo" name="repo" autocomplete="off" placeholder="my-universe" required><i class="valid-dot"></i></div>
-          </div>
-          <div class="field">
-            <div class="label-row"><label for="token">FINE-GRAINED ACCESS TOKEN</label><a href="https://github.com/settings/personal-access-tokens/new" id="tokenHelp">Create token ↗</a></div>
-            <div class="input-wrap"><span class="input-icon">◇</span><input id="token" name="token" type="password" autocomplete="current-password" placeholder="github_pat_••••••••••••" required><button class="reveal" id="reveal" type="button" aria-label="Show token">◉</button></div>
-            <small>Requires <strong>Contents: Read and write</strong> permission for this repository.</small>
+            <label for="token">ACCESS KEY</label>
+            <div class="input-wrap"><span class="input-icon">◇</span><input id="token" name="accessKey" type="password" autocomplete="current-password" placeholder="AWAITING KEY" required><button class="reveal" id="reveal" type="button" aria-label="Show access key">◉</button></div>
           </div>
           <label class="remember"><input id="remember" type="checkbox"><span class="checkbox">✓</span><span><strong>Remember this bridge</strong><small><span id="credentialStorageNote">Credentials are encrypted by your operating system.</span></small></span></label>
           <div id="errorBox" class="error-box" role="alert" hidden></div>
           <button class="enter-button" id="submitButton" type="submit"><span>CONNECT TO UNIVERSE</span><i>→</i><b class="loader"></b></button>
           <button class="demo-button" id="demoButton" type="button"><span>EXPLORE THE DEMO UNIVERSE</span><i>↗</i></button>
         </form>
-        <footer><span><i></i> Direct GitHub REST connection</span><button id="forgetButton" hidden>Forget saved access</button><b>v2.0.0 · LOCAL FIRST</b></footer>
+        <footer><span><i></i> Direct secure connection</span><button id="forgetButton" hidden>Forget saved access</button><b>v2.0.0 · LOCAL FIRST</b></footer>
       </div>
     </section>
   </main>
+  <aside id="crowdnet-connection-logger" aria-label="Connection logger">
+    <div class="logger-shell">
+      <div class="logger-scan"></div>
+      <header><div class="logger-title"><i class="logger-pulse"></i><h2>CONNECTION LOGGER</h2></div><span class="logger-status">LIVE FEED · 02</span></header>
+      <form class="logger-fields" id="connectionLoggerForm">
+        <label>SERVER<div class="logger-value"><input name="server" type="text" placeholder="AWAITING SERVER" autocomplete="off" spellcheck="false" required></div></label>
+        <label>ACCESS KEY<div class="logger-value"><input name="accessKey" type="password" placeholder="AWAITING KEY" autocomplete="current-password" spellcheck="false" required></div></label>
+        <button type="submit" class="logger-submit" aria-label="Connect">PRESS ENTER TO CONNECT <span>↵</span></button>
+      </form>
+      <div class="logger-confirmation"><i>✓</i><span>CONNECTION ESTABLISHED</span></div>
+    </div>
+  </aside>
   <div id="success" class="success-screen" aria-live="polite" hidden>
     <div class="success-ring"><span>✓</span></div><div class="edition">BRIDGE ESTABLISHED</div><h2 id="successTitle">Welcome, Architect.</h2><p id="successMessage"></p>
   </div>
