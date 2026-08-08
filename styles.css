@@ -18,26 +18,38 @@
 #crowdnet-connection-logger .logger-shell{position:relative;overflow:hidden;padding:18px;border-radius:17px;background:linear-gradient(145deg,#19080ef7,#08080dfb 58%,#18070df7);color:#fff}
 #crowdnet-connection-logger .logger-shell::before{content:"";position:absolute;inset:-80% -35%;pointer-events:none;background:conic-gradient(from 90deg,transparent,#ff234238,transparent 28%);animation:crowdnetLoggerSweep 5s linear infinite}
 #crowdnet-connection-logger .logger-scan{position:absolute;inset:0;pointer-events:none;opacity:.7;background:linear-gradient(transparent 0 48%,#ff40521a 50%,transparent 52%);background-size:100% 9px;animation:crowdnetLoggerScan 7s linear infinite}
-#crowdnet-connection-logger header,#crowdnet-connection-logger label{position:relative;z-index:1}
+#crowdnet-connection-logger header,#crowdnet-connection-logger label,#crowdnet-connection-logger .logger-actions{position:relative;z-index:1}
 #crowdnet-connection-logger header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 #crowdnet-connection-logger .logger-title{display:flex;align-items:center;gap:10px}
 #crowdnet-connection-logger .logger-pulse{width:9px;height:9px;border-radius:50%;background:var(--logger-red);box-shadow:0 0 15px var(--logger-red);animation:crowdnetLoggerPulse 1.7s ease-out infinite}
 #crowdnet-connection-logger h2{margin:0;color:#ffe8eb;font-size:10px;letter-spacing:.2em}
 #crowdnet-connection-logger header>span{color:#ff7a8a;font-size:7px;letter-spacing:.16em}
 #crowdnet-connection-logger .logger-fields{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1.15fr;gap:10px}
+#crowdnet-connection-logger .logger-storage{grid-column:1/-1}
+#crowdnet-connection-logger .logger-storage>span{float:right;color:#714650;font-size:6px}
 #crowdnet-connection-logger label{display:block;color:#ff7585;font-size:7px;letter-spacing:.2em}
 #crowdnet-connection-logger .logger-value{position:relative;display:flex;align-items:center;height:48px;margin-top:7px;padding:0 12px;border:1px solid #842333;background:#0a090e;transition:border-color .25s,box-shadow .25s,transform .25s}
 #crowdnet-connection-logger .logger-value:focus-within{border-color:#ff304b;box-shadow:inset 0 0 18px #ff19331c,0 0 14px #ff19333d;transform:translateY(-1px)}
 #crowdnet-connection-logger .logger-value::after{content:"";position:absolute;left:0;bottom:-1px;width:32%;height:1px;background:#ff334d;box-shadow:0 0 9px #ff334d;animation:crowdnetLoggerData 2.8s ease-in-out infinite}
 #crowdnet-connection-logger input{width:100%;min-width:0;padding:0;border:0;outline:0;background:transparent;color:#fff;font:700 10px/1 inherit;letter-spacing:.04em;text-overflow:ellipsis}
 #crowdnet-connection-logger input::placeholder{color:#6d4149;font-weight:400;letter-spacing:.09em}
-#crowdnet-connection-logger .logger-submit{grid-column:1/-1;border:0;background:none;color:#8e505a;font:700 7px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;text-align:right;cursor:pointer;padding:2px 1px 0}
-#crowdnet-connection-logger .logger-submit span{color:#ff5269;font-size:11px;margin-left:5px}
-#crowdnet-connection-logger .logger-confirmation{position:absolute;z-index:4;inset:0;display:flex;align-items:center;justify-content:center;gap:12px;opacity:0;pointer-events:none;color:#baffc9;font-size:9px;font-weight:700;letter-spacing:.18em;background:linear-gradient(145deg,#07170df7,#050b08fb)}
-#crowdnet-connection-logger .logger-confirmation i{display:grid;place-items:center;width:29px;height:29px;border:1px solid #36ee72;border-radius:50%;font-style:normal;box-shadow:0 0 20px #22d75f88}
+#crowdnet-connection-logger .logger-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:15px}
+#crowdnet-connection-logger .logger-security{display:flex;align-items:center;gap:8px;color:#714650;font-size:6px;letter-spacing:.13em}
+#crowdnet-connection-logger .logger-security i{width:5px;height:5px;border-radius:50%;background:#913044;box-shadow:0 0 8px #ff1838}
+#crowdnet-connection-logger .logger-actions button{position:relative;overflow:hidden;min-width:112px;padding:10px 14px;border:1px solid #7d2938;background:linear-gradient(110deg,#1b0c12,#0b0a0f);color:#ff9aa8;font:700 7px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;cursor:pointer;transition:.25s}
+#crowdnet-connection-logger .logger-actions button:hover{color:#fff;border-color:#ff3c57;box-shadow:0 0 18px #ff193329;transform:translateY(-1px)}
+#crowdnet-connection-logger .logger-actions button:focus-visible{outline:2px solid #ff6479;outline-offset:3px}
+#crowdnet-connection-logger .logger-success{position:absolute;z-index:4;inset:0;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 45%,#123b29f5,#050b09fc 62%);text-align:center;opacity:0;visibility:hidden;pointer-events:none}
+#crowdnet-connection-logger .logger-success-ring{position:relative;width:92px;height:92px;display:grid;place-items:center;margin:0 auto 20px;border:1px solid #5dffa5;border-radius:50%;box-shadow:0 0 38px #4fff9740,inset 0 0 28px #4fff9718}
+#crowdnet-connection-logger .logger-success-ring::before,#crowdnet-connection-logger .logger-success-ring::after{content:"";position:absolute;border:1px solid #5dffa566;border-radius:50%}
+#crowdnet-connection-logger .logger-success-ring::before{inset:-10px;border-style:dashed;animation:crowdnetLoggerOrbit 2.4s linear infinite}
+#crowdnet-connection-logger .logger-success-ring::after{inset:9px}
+#crowdnet-connection-logger .logger-check{width:27px;height:14px;border-left:3px solid #5dffa5;border-bottom:3px solid #5dffa5;transform:translateY(-4px) rotate(-45deg);filter:drop-shadow(0 0 7px #5dffa5)}
+#crowdnet-connection-logger .logger-success p{margin:0 0 8px;color:#aaffca;font-size:11px;font-weight:700;letter-spacing:.14em}
+#crowdnet-connection-logger .logger-success span{color:#5d9b76;font-size:7px;letter-spacing:.18em}
 #crowdnet-connection-logger.is-error{animation:crowdnetLoggerShake .35s ease}
 #crowdnet-connection-logger.is-connected{--logger-red:#36ee72;background:linear-gradient(115deg,#08b845,#83ffa8 35%,#08c94b 68%,#b1ffc7);box-shadow:0 0 0 2px #54f187,0 0 38px #20e764bb,0 0 100px #20e76455,0 24px 70px #000c;animation:crowdnetLoggerConnect 1.15s cubic-bezier(.7,0,.3,1) forwards}
-#crowdnet-connection-logger.is-connected .logger-confirmation{animation:crowdnetLoggerConfirm 1.15s ease forwards}
+#crowdnet-connection-logger.is-connected .logger-success{visibility:visible;animation:crowdnetLoggerConfirm 1.15s ease forwards}
 @keyframes crowdnetLoggerArrive{from{opacity:0;transform:translate3d(35px,45px,0) scale(.88);filter:blur(12px)}}
 @keyframes crowdnetLoggerBorder{50%{background-position:100% 50%}}
 @keyframes crowdnetLoggerSweep{to{transform:rotate(360deg)}}
@@ -46,6 +58,7 @@
 @keyframes crowdnetLoggerData{50%{width:78%;opacity:.45}}
 @keyframes crowdnetLoggerShake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 @keyframes crowdnetLoggerConfirm{20%,72%{opacity:1}100%{opacity:0}}
+@keyframes crowdnetLoggerOrbit{to{transform:rotate(360deg)}}
 @keyframes crowdnetLoggerConnect{0%{transform:scale(1)}25%{transform:scale(1.025)}55%{transform:scale(.96);border-radius:22px}100%{opacity:0;transform:translateY(calc(-100vh - 80px)) scale(.18,.08);border-radius:50%;filter:blur(5px)}}
 @media(max-width:520px){#crowdnet-connection-logger{width:min(330px,calc(100vw - 32px))}#crowdnet-connection-logger .logger-fields{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){#crowdnet-connection-logger,#crowdnet-connection-logger *,#crowdnet-connection-logger *::before,#crowdnet-connection-logger *::after{animation-duration:.01ms!important;transition:none!important}}

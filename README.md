@@ -31,6 +31,7 @@ The current codebase demonstrates:
 - a desktop Electron shell with a custom cinematic interface;
 - a demo universe that can be opened without GitHub credentials;
 - GitHub repository connection through a fine-grained personal access token;
+- optional Google Drive API-key entry at login for Drive-backed audiobook features;
 - creation and editing of universe identity, character, location, and map records;
 - image compression and repository-backed artwork storage;
 - nested map, zone, and location views;
@@ -68,6 +69,8 @@ Because this integration is still experimental:
 5. Revoke the token when testing is complete.
 
 Never commit a personal access token to this repository or place one in screenshots, issues, or logs.
+
+The Google Drive API key is optional. When supplied at login, Mediator uses that key directly for Google Drive requests. Remembered keys use the same operating-system encrypted credential file as the bridge token in the Electron client; browser builds store remembered values only in that browser profile.
 
 ## Run the prototype
 
