@@ -25,8 +25,6 @@
 #crowdnet-connection-logger h2{margin:0;color:#ffe8eb;font-size:10px;letter-spacing:.2em}
 #crowdnet-connection-logger header>span{color:#ff7a8a;font-size:7px;letter-spacing:.16em}
 #crowdnet-connection-logger .logger-fields{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1.15fr;gap:10px}
-#crowdnet-connection-logger .logger-storage{grid-column:1/-1}
-#crowdnet-connection-logger .logger-storage>span{float:right;color:#714650;font-size:6px}
 #crowdnet-connection-logger label{display:block;color:#ff7585;font-size:7px;letter-spacing:.2em}
 #crowdnet-connection-logger .logger-value{position:relative;display:flex;align-items:center;height:48px;margin-top:7px;padding:0 12px;border:1px solid #842333;background:#0a090e;transition:border-color .25s,box-shadow .25s,transform .25s}
 #crowdnet-connection-logger .logger-value:focus-within{border-color:#ff304b;box-shadow:inset 0 0 18px #ff19331c,0 0 14px #ff19333d;transform:translateY(-1px)}
