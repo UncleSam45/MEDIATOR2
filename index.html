@@ -54,10 +54,6 @@
             <label for="token">ACCESS KEY</label>
             <div class="input-wrap"><span class="input-icon">◇</span><input id="token" name="accessKey" type="password" autocomplete="current-password" placeholder="AWAITING KEY" required><button class="reveal" id="reveal" type="button" aria-label="Show access key">◉</button></div>
           </div>
-          <div class="field">
-            <label for="driveApiKey">GOOGLE DRIVE API KEY <small>(OPTIONAL)</small></label>
-            <div class="input-wrap"><span class="input-icon">◈</span><input id="driveApiKey" name="driveApiKey" type="password" autocomplete="off" placeholder="ONLY REQUIRED FOR DRIVE FEATURES"><button class="reveal" id="revealDriveKey" type="button" aria-label="Show Google Drive API key">◉</button></div>
-          </div>
           <label class="remember"><input id="remember" type="checkbox"><span class="checkbox">✓</span><span><strong>Remember this bridge</strong><small><span id="credentialStorageNote">Credentials are encrypted by your operating system.</span></small></span></label>
           <div id="errorBox" class="error-box" role="alert" hidden></div>
           <button class="enter-button" id="submitButton" type="submit"><span>CONNECT TO UNIVERSE</span><i>→</i><b class="loader"></b></button>
@@ -76,7 +72,6 @@
         <div class="logger-fields">
           <label>SERVER<div class="logger-value"><input name="server" type="text" placeholder="AWAITING SERVER" autocomplete="off" spellcheck="false" required></div></label>
           <label>ACCESS KEY<div class="logger-value"><input name="accessKey" type="password" placeholder="AWAITING KEY" autocomplete="current-password" spellcheck="false" required></div></label>
-          <label class="logger-storage">GOOGLE DRIVE API KEY <span>OPTIONAL</span><div class="logger-value"><input name="driveApiKey" type="password" placeholder="AWAITING GOOGLE API KEY" autocomplete="off" spellcheck="false"></div></label>
         </div>
         <div class="logger-actions"><span class="logger-security"><i></i> END-TO-END ENCRYPTED</span><button type="submit">CONFIRM <span aria-hidden="true">→</span></button></div>
       </form>
